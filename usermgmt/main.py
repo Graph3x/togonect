@@ -40,21 +40,22 @@ app.add_middleware(
 @app.get("/auth")
 def authentication(request: Request, token: str):
     try:
-        # Specify the CLIENT_ID of the app that accesses the backend:
         user = id_token.verify_oauth2_token(token, requests.Request(
         ), "482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com")
 
-        request.session['user'] = {"email": user["email"]}
-
-        return user['name'] + ' Logged In successfully'
+        if user['email_verified']:
+            return f'test_token_for_{user["name"]}'  # TODO
+        else:
+            return 'error_email_not_verified'
 
     except ValueError:
-        return "unauthorized"
+        return 'authentication failed'
 
 
 @app.get('/')
-def check(request: Request):
-    try:
-        return "hi " + str(request.session.get('user')['email'])
-    except TypeError:
-        return {'detail': 'User not logged in'}
+def check(request: Request, token: str):
+
+    if token != 'null':
+        return 'authenticated'
+    else:
+        return 'error_token_not_valid'

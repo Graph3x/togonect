@@ -1,27 +1,22 @@
 import {React, Component} from 'react';
-//import GoogleLogin from 'react-google-login';
 import { GoogleLogin } from '@react-oauth/google';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 const responseGoogle = (response) => {
-  console.log(response);
+  fetch('http://localhost:8000/auth?token=' + response.credential)
+  .then((response) => {return response.json();})
+  .then((jsondata) => {localStorage.setItem('token', jsondata);})
+
 }
 
 const temp = () =>{
-  fetch('http://localhost:8000',{
-    credentials:'include' 
-  })
-  .then((response) => {
-    return response.json();
-  })
-  .then((myJson) => {
-    alert(myJson)
-  });
+  fetch('http://localhost:8000/?token=' + localStorage.getItem('token'))
+  .then((response) => {return response.json();})
+  .then((jsondata) => {alert(jsondata);})
 }
 
 class GoogleButton extends Component {
-
   render() {
     return (
       <div className="GoogleLogin">
@@ -31,12 +26,12 @@ class GoogleButton extends Component {
             onError={() => {
               console.log('Login Failed');
             }}
-          />;
-        </GoogleOAuthProvider>;
-        <br/>
-        <br/>
-        <br/>
-        <button onClick={temp}> Check session </button>
+          />
+        </GoogleOAuthProvider>
+        
+        <br />
+        <br />
+        <button onClick={temp}>TEST</button>
     </div>
   );
   }

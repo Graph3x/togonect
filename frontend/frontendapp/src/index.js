@@ -1,5 +1,7 @@
 import {React} from 'react';
-import ReactDOM from 'react-dom';
-import GoogleButton from './components/googleButton'
+import {createRoot} from 'react-dom/client';
+import GoogleButton from './components/googleButton';
 
-ReactDOM.render(<GoogleButton/>, document.getElementById('root'))
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<GoogleButton/>);
