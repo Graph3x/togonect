@@ -37,7 +37,7 @@ def start_application():
 app = start_application()
 
 origins = [
-    "http://localhost:3000",
+    settings.FRONTEND_ORIGIN,
 ]
 
 app.add_middleware(
@@ -61,14 +61,15 @@ def authentication(token: str, db: Session = Depends(get_db)):
                 return user_in_db.token
             else:
                 future_user = schemas.UserCreate(
-                    email=user['email'], username='', gtoken=token, token=utils.generate_token(user['email'], 256))
+                    email=user['email'], username='', gtoken=token, token=utils.generate_token(user['email'], settings.TOKEN_LEN))
                 new_user = crud.create_user(db, future_user)
                 return new_user.token
         else:
-            return 'error_email_not_verified'
+            raise HTTPException(
+                status_code=400, detail="Email Not Verified By Google")
 
     except ValueError:
-        return 'authentication failed'
+        raise HTTPException(status_code=400, detail="Invalid Google Login")
 
 
 # DEVELOPMENT ONLY#########TODO###########################################################
