@@ -1,17 +1,30 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from config import settings
-from session import engine
-from base_class import Base
-
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.middleware.sessions import SessionMiddleware
+
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
+from sqlalchemy.orm import Session
+
+import crud
+import models
+import schemas
+from database import SessionLocal, engine
+
+import utils
+
 
 def create_tables():
-    Base.metadata.create_all(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def start_application():
@@ -27,7 +40,6 @@ origins = [
     "http://localhost:3000",
 ]
 
-app.add_middleware(SessionMiddleware, secret_key='TODOsecretkey')  # TODO
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -38,13 +50,20 @@ app.add_middleware(
 
 
 @app.get("/auth")
-def authentication(request: Request, token: str):
+def authentication(token: str, db: Session = Depends(get_db)):
     try:
         user = id_token.verify_oauth2_token(token, requests.Request(
         ), "482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com")
 
         if user['email_verified']:
-            return f'test_token_for_{user["name"]}'  # TODO
+            user_in_db = crud.get_user_by_email(db, user['email'])
+            if user_in_db:
+                return user_in_db.token
+            else:
+                future_user = schemas.UserCreate(
+                    email=user['email'], username='', gtoken=token, token=utils.generate_token(user['email'], 256))
+                new_user = crud.create_user(db, future_user)
+                return new_user.token
         else:
             return 'error_email_not_verified'
 
@@ -52,10 +71,42 @@ def authentication(request: Request, token: str):
         return 'authentication failed'
 
 
-@app.get('/')
-def check(request: Request, token: str):
+# DEVELOPMENT ONLY#########TODO###########################################################
 
-    if token != 'null':
-        return 'authenticated'
+
+@app.get('/')
+def check(token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        return 'allowed'
     else:
-        return 'error_token_not_valid'
+        return 'Denied'
+
+
+@app.post("/users/", response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_user(db=db, user=user)
+
+
+@app.get("/users/", response_model=list[schemas.User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users
+
+
+@app.get("/users/{user_id}", response_model=schemas.User)
+def read_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return crud.delete_user(db, db_user=db_user)
