@@ -1,17 +1,18 @@
 import {React, Component} from 'react';
 import {Navigate} from 'react-router-dom';
 
-class LogoutButton extends Component {
+class ResetTokenButton extends Component {
 
   state = {
     redirect: false
   }
 
-  logout = () => {
+  resetToken = () => {
+    let token = localStorage.getItem('token');
+    let togo_id = localStorage.getItem('togo_id');
+    let new_token = fetch('http://localhost:8000/users/' + togo_id + '/deletetoken?token=' + token);
     localStorage.removeItem('token');
-    localStorage.removeItem('togo_id');
     this.setRedirect();
-
 }
 
   setRedirect = () => {
@@ -27,15 +28,14 @@ class LogoutButton extends Component {
   }
 
 
-
   render() {
     return (
     <div>
         {this.renderRedirect()}
-        <button onClick={this.logout}>LOGOUT</button>
+        <button onClick={this.resetToken}>RESET TOKEN</button>
     </div>
   );
   }
 }
 
-export default LogoutButton;
+export default ResetTokenButton;

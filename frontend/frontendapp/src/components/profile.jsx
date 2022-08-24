@@ -1,6 +1,6 @@
 import {React, Component} from 'react';
 import { useParams } from 'react-router-dom';
-import LogoutButton from './logoutButton';
+
 
 function withParams(Component) {
     return props => <Component {...props} params={useParams()}/>;
@@ -10,11 +10,13 @@ function withParams(Component) {
 class Profile extends Component {
 
     state = {
-        userdata : 'None'
+        userdata : 'None',
+        id : 'None'
     }
 
   componentDidMount() {
     let { iden } = this.props.params;
+    this.setState({'id' : iden})
     this.getProfile(iden);
   }
 
@@ -25,7 +27,7 @@ class Profile extends Component {
   }
 
 
-  settings = () => {
+  options = () => {
     alert('TODO')
   }
 
@@ -34,15 +36,20 @@ class Profile extends Component {
     alert('TODO')
   }
 
+  renderEdit = () => {
+    if(this.state.id == localStorage.getItem('togo_id')) {
+      return <button onClick={this.edit}>EDIT</button>
+    } 
+  }
+
 
   render() {
     return (
         <div id='profile'>
-            <button onClick={this.settings}>OPTIONS</button>
-            <button onClick={this.edit}>EDIT</button>
+            <button onClick={this.options}>OPTIONS</button>
+            {this.renderEdit()}
             <img src={this.state.userdata.profile_picture} alt='Profile picture' height={300} width={300}/>
             <h1>{this.state.userdata.username}</h1>
-            <LogoutButton></LogoutButton>
         </div>
   );
   }
