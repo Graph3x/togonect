@@ -29,3 +29,33 @@ def delete_user(db: Session, db_user: models.User):
     db.delete(db_user)
     db.commit()
     return True
+
+
+def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
+    try:
+        user = db.query(models.User).filter(models.User.id == user_id).first()
+        user.username = new_data.username
+        db.commit()
+        return True
+    except Exception:
+        return False
+
+
+def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
+    try:
+        user = db.query(models.User).filter(models.User.id == user_id).first()
+        user.username = new_data.username
+        db.commit()
+        return True
+    except Exception:
+        return False
+
+
+def change_token(db: Session, user: models.User, new_token: str):
+    try:
+        user.token = new_token
+        user.token_expiration = 30
+        db.commit()
+        return True
+    except Exception:
+        return False

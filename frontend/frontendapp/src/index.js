@@ -13,7 +13,7 @@ root.render(
         <Routes>
             <Route path='/' element={<Layout/>}>
                 <Route index element={<LoginBlock/>} />
-                <Route path='/homepage/:iden' element={<p>homepage</p>} />
+                <Route path='/homepage/' element={<p>homepage</p>} />
                 <Route path='profile/:iden' element={<Profile/>} />
 
                 <Route path='*' element={<h1>404: Not Found</h1>} />

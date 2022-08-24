@@ -24,11 +24,22 @@ class Profile extends Component {
     .then((jsondata) => {this.setState({userdata:jsondata})})
   }
 
+
+  settings = () => {
+    alert('TODO')
+  }
+
+
+  edit = () => {
+    alert('TODO')
+  }
+
+
   render() {
     return (
         <div id='profile'>
-            <button>OPTIONS</button>
-            <button>EDIT</button>
+            <button onClick={this.settings}>OPTIONS</button>
+            <button onClick={this.edit}>EDIT</button>
             <img src={this.state.userdata.profile_picture} alt='Profile picture' height={300} width={300}/>
             <h1>{this.state.userdata.username}</h1>
             <LogoutButton></LogoutButton>
