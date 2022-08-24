@@ -1,4 +1,5 @@
 import {React, Component} from 'react';
+import { Navigate } from 'react-router-dom'
 
 
 const temp = () =>{
@@ -7,10 +8,32 @@ const temp = () =>{
   .then((jsondata) => {alert(jsondata);})
 }
 
+
+
 class TestButton extends Component {
+  state = {
+    redirect: false
+  }
+
+  setRedirect = () => {
+    this.setState({redirect: true})
+  }
+
+  renderRedirect = () => {
+    if (this.state.redirect)
+    {
+      return(<Navigate to='/'/>)
+    }
+  }
+
+
   render() {
     return (
-    <button onClick={temp}>TEST</button>
+      <div>
+        {this.renderRedirect()}
+        <button onClick={this.setRedirect}>TEST</button>
+      </div>
+    
   );
   }
 }

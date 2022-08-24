@@ -14,3 +14,4 @@ class User(Base):
 
     username = Column(String, unique=False, nullable=False)
     is_active = Column(Boolean(), default=False)
+    profile_picture = Column(String, nullable=True)

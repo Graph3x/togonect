@@ -48,6 +48,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#######################################################################################################################
+
 
 @app.get("/auth")
 def authentication(token: str, db: Session = Depends(get_db)):
@@ -55,13 +57,15 @@ def authentication(token: str, db: Session = Depends(get_db)):
         user = id_token.verify_oauth2_token(token, requests.Request(
         ), "482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com")
 
+        print(user['picture'])
+
         if user['email_verified']:
             user_in_db = crud.get_user_by_email(db, user['email'])
             if user_in_db:
                 return user_in_db.token
             else:
                 future_user = schemas.UserCreate(
-                    email=user['email'], username='', gtoken=token, token=utils.generate_token(user['email'], settings.TOKEN_LEN))
+                    email=user['email'], username=user['name'], gtoken=token, token=utils.generate_token(user['email'], settings.TOKEN_LEN), profile_picture=user['picture'])
                 new_user = crud.create_user(db, future_user)
                 return new_user.token
         else:
