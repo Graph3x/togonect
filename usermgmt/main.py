@@ -76,6 +76,15 @@ def authentication(token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid Google Login")
 
 
+@app.get('/users/getid')
+def get_user_id(token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        dbuser = crud.get_user_by_email(db, token[:-256])
+        print(dbuser.id)
+        return dbuser.id
+    else:
+        raise HTTPException(status_code=400, detail="Invalid token")
+
 # DEVELOPMENT ONLY#########TODO###########################################################
 
 

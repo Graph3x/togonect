@@ -12,9 +12,11 @@ root.render(
     <BrowserRouter>
         <Routes>
             <Route path='/' element={<Layout/>}>
-                <Route index element={<p>INDEX</p>} />
-                <Route path='login' element={<LoginBlock/>} />
+                <Route index element={<LoginBlock/>} />
+                <Route path='/homepage/:iden' element={<p>homepage</p>} />
                 <Route path='profile/:iden' element={<Profile/>} />
+
+                <Route path='*' element={<h1>404: Not Found</h1>} />
             </Route>
         </Routes>
     </BrowserRouter>

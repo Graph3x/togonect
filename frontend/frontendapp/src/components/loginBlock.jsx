@@ -1,6 +1,5 @@
 import {React, Component} from 'react';
 import GoogleButton from './googleButton';
-import LogoutButton from './logoutButton';
 import TestButton from './testButton';
 
 
@@ -9,8 +8,6 @@ class LoginBlock extends Component {
     return (
         <div id='google_login'>
             <GoogleButton></GoogleButton>
-            <br />
-            <LogoutButton></LogoutButton>
             <br />
             <TestButton></TestButton>
         </div>

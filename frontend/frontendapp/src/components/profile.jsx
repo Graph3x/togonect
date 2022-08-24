@@ -1,6 +1,6 @@
 import {React, Component} from 'react';
 import { useParams } from 'react-router-dom';
-
+import LogoutButton from './logoutButton';
 
 function withParams(Component) {
     return props => <Component {...props} params={useParams()}/>;
@@ -31,6 +31,7 @@ class Profile extends Component {
             <button>EDIT</button>
             <img src={this.state.userdata.profile_picture} alt='Profile picture' height={300} width={300}/>
             <h1>{this.state.userdata.username}</h1>
+            <LogoutButton></LogoutButton>
         </div>
   );
   }

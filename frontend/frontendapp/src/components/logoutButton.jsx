@@ -1,13 +1,40 @@
 import {React, Component} from 'react';
-
-
-const logout = () => {localStorage.removeItem('token');}
-
+import {Navigate} from 'react-router-dom';
 
 class LogoutButton extends Component {
+
+  state = {
+    redirect: false
+  }
+
+  logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('togo_id');
+    this.setRedirect();
+
+}
+
+  setRedirect = () => {
+    this.setState({redirect: true})
+  }
+
+
+  renderRedirect = () => {
+    if (this.state.redirect)
+    {
+      const token = localStorage.getItem('token');
+      return(<Navigate to='/'/>);
+    }
+  }
+
+
+
   render() {
     return (
-    <button onClick={logout}>LOGOUT</button>
+    <div>
+        {this.renderRedirect()}
+        <button onClick={this.logout}>LOGOUT</button>
+    </div>
   );
   }
 }

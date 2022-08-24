@@ -31,7 +31,7 @@ class TestButton extends Component {
     return (
       <div>
         {this.renderRedirect()}
-        <button onClick={this.setRedirect}>TEST</button>
+        <button onClick={temp}>TEST</button>
       </div>
     
   );
