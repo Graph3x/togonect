@@ -1,5 +1,7 @@
 import {React, Component} from 'react';
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import OptionsMenu from './optionsMenu';
 
 
 function withParams(Component) {
@@ -11,7 +13,8 @@ class Profile extends Component {
 
     state = {
         userdata : 'None',
-        id : 'None'
+        id : 'None',
+        render_options: false,
     }
 
   componentDidMount() {
@@ -28,18 +31,24 @@ class Profile extends Component {
 
 
   options = () => {
-    alert('TODO')
+    if(this.state.render_options){this.setState({render_options: false})}
+    else {this.setState({render_options: true})}
   }
 
-
-  edit = () => {
-    alert('TODO')
-  }
 
   renderEdit = () => {
     if(this.state.id == localStorage.getItem('togo_id')) {
-      return <button onClick={this.edit}>EDIT</button>
+      let path = '/profile/' + localStorage.getItem('togo_id') + '/edit'
+      return <Link to={path}>EDIT</Link>
     } 
+  }
+
+
+  renderOptions = () => {
+    if (this.state.render_options)
+    {
+      return <OptionsMenu/>
+    }
   }
 
 
@@ -47,7 +56,9 @@ class Profile extends Component {
     return (
         <div id='profile'>
             <button onClick={this.options}>OPTIONS</button>
+            {this.renderOptions()}
             {this.renderEdit()}
+            <br/>
             <img src={this.state.userdata.profile_picture} alt='Profile picture' height={300} width={300}/>
             <h1>{this.state.userdata.username}</h1>
         </div>

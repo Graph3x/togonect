@@ -5,6 +5,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Layout from './components/Layout';
 import LoginBlock from './components/loginBlock';
 import Profile from './components/profile';
+import EditPage from './components/editPage';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
@@ -13,8 +14,9 @@ root.render(
         <Routes>
             <Route path='/' element={<Layout/>}>
                 <Route index element={<LoginBlock/>} />
-                <Route path='/homepage/' element={<p>homepage</p>} />
+                <Route path='homepage/' element={<p>homepage</p>} />
                 <Route path='profile/:iden' element={<Profile/>} />
+                <Route path='profile/:iden/edit' element={<EditPage/>} />
 
                 <Route path='*' element={<h1>404: Not Found</h1>} />
             </Route>
