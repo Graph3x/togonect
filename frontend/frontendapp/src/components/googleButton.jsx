@@ -30,7 +30,7 @@ class GoogleButton extends Component {
       .then((jsondata) => {this.setState({togoid: jsondata})});
 
       if (this.state.togoid != 0) {
-        return(<Navigate to={'/profile/' + this.state.togoid}/>)
+        return(<Navigate to={'/profile/' + this.state.togoid + '/edit'}/>)
       }
     }
   }

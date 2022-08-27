@@ -1,7 +1,12 @@
 import {React, Component} from 'react';
 import {Navigate} from 'react-router-dom';
+import ConfirmPopup from './popup';
 
 class DeleteUserButton extends Component {
+    constructor(props){  
+      super(props);  
+      this.state = { showPopup: false };  
+    }
 
   state = {
     redirect: false
@@ -27,12 +32,24 @@ class DeleteUserButton extends Component {
   }
 
 
+  togglePopup() {  
+    this.setState({showPopup: !this.state.showPopup});  
+  }
+
+
+  confirm = () => {
+    this.setState({showPopup: !this.state.showPopup});
+    this.deleteUser();
+  }
+
 
   render() {
     return (
     <div>
         {this.renderRedirect()}
-        <button onClick={this.deleteUser}>DELETE ACCOUNT</button>
+        <button onClick={this.togglePopup.bind(this)}>DELETE ACCOUNT</button>
+        {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO DELETE YOUR ACCOUNT, ARE YOU SURE?'
+        cancelPopup={this.togglePopup.bind(this)} confirmPopup={this.confirm}/> : null}
     </div>
   );
   }

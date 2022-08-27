@@ -1,7 +1,12 @@
 import {React, Component} from 'react';
 import {Navigate} from 'react-router-dom';
+import ConfirmPopup from './popup';
 
 class ResetTokenButton extends Component {
+    constructor(props){  
+      super(props);  
+      this.state = { showPopup: false };  
+    }
 
   state = {
     redirect: false
@@ -10,7 +15,7 @@ class ResetTokenButton extends Component {
   resetToken = () => {
     let token = localStorage.getItem('token');
     let togo_id = localStorage.getItem('togo_id');
-    let new_token = fetch('http://localhost:8000/users/' + togo_id + '/deletetoken?token=' + token);
+    fetch('http://localhost:8000/users/' + togo_id + '/deletetoken?token=' + token);
     localStorage.removeItem('token');
     this.setRedirect();
 }
@@ -28,11 +33,24 @@ class ResetTokenButton extends Component {
   }
 
 
+  togglePopup() {  
+    this.setState({showPopup: !this.state.showPopup});  
+  }
+
+
+  confirm = () => {
+    this.setState({showPopup: !this.state.showPopup});
+    this.resetToken();
+  }
+
+
   render() {
     return (
     <div>
         {this.renderRedirect()}
-        <button onClick={this.resetToken}>RESET TOKEN</button>
+        <button onClick={this.togglePopup.bind(this)}>RESET TOKEN</button>
+        {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO RESET YOUR ACCESS TOKEN, ARE YOU SURE?'
+        cancelPopup={this.togglePopup.bind(this)} confirmPopup={this.confirm}/> : null}
     </div>
   );
   }

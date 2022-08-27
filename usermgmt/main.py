@@ -92,7 +92,7 @@ def get_user_id(token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid token")
 
 
-@app.get("/users/{user_id}", response_model=schemas.UserBase)
+@app.get("/users/{user_id}", response_model=schemas.User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:

@@ -48,16 +48,20 @@ class EditPage extends Component {
   }
 
   handleSave = () => {
-    const requestOptions = {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: this.state.value })
+    if(this.state.value) {
+      const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: this.state.value })
+      }
+      let path = 'http://localhost:8000/users/' + this.state.id + '/edit?token=' + localStorage.getItem('token'); 
+      fetch(path, requestOptions)
     }
-    let path = 'http://localhost:8000/users/' + this.state.id + '/edit?token=' + localStorage.getItem('token'); 
-    fetch(path, requestOptions)
     this.setRedirect();
   }
 
+  temp = () => {if(this.state.value) {alert('yep')}}
+  
 
   render() {
     return (
