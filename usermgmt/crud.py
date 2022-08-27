@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 import models
 import schemas
+import utils
 
 
 def get_user(db: Session, user_id: int):
@@ -42,6 +43,8 @@ def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
 
 
 def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
+    if not utils.validate_username(new_data.username):
+        return False
     try:
         user = db.query(models.User).filter(models.User.id == user_id).first()
         user.username = new_data.username

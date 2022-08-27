@@ -62,13 +62,7 @@ def authentication(token: str, db: Session = Depends(get_db)):
         if user['email_verified']:
             user_in_db = crud.get_user_by_email(db, user['email'])
             if user_in_db:
-                if user_in_db.token_expiration > 0:
-                    return user_in_db.token
-                else:
-                    new_token = utils.generate_token(
-                        user_in_db.email, settings.TOKEN_LEN)
-                    crud.change_token(db, user_in_db, new_token)
-                    return new_token
+                return user_in_db.token
             else:
                 future_user = schemas.UserCreate(
                     email=user['email'], username=user['name'], gtoken=token, token=utils.generate_token(user['email'], settings.TOKEN_LEN), profile_picture=user['picture'], token_expiration=30)

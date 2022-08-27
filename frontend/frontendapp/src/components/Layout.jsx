@@ -1,11 +1,14 @@
 import React from "react";
-import {Outlet} from "react-router-dom";
+import {Outlet, useLocation} from "react-router-dom";
 import Navbar from "./navbar";
 
 const Layout = () => {
+
+  let location = useLocation()
+
   return (
     <>
-      <Navbar/>
+      {location.pathname == '/' ? null : <Navbar/>}
       <Outlet />
     </>
   );
