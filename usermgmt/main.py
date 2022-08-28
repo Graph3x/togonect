@@ -80,7 +80,6 @@ def authentication(token: str, db: Session = Depends(get_db)):
 def get_user_id(token: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         dbuser = crud.get_user_by_email(db, token[:-256])
-        print(dbuser.id)
         return dbuser.id
     else:
         raise HTTPException(status_code=400, detail="Invalid token")
@@ -118,7 +117,7 @@ def delete_user(user_id: int, token: str, db: Session = Depends(get_db)):
 
 
 @app.get("/users/{user_id}/deletetoken")
-def read_user(user_id: int, token: str, db: Session = Depends(get_db)):
+def delete_token(user_id: int, token: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -132,6 +131,133 @@ def read_user(user_id: int, token: str, db: Session = Depends(get_db)):
 
 
 # IN PROGRESS #########TODO###########################################################
+
+
+@app.get("/users/{users_id}/friends")
+def get_friends(users_id: int, token: str, db: Session = Depends(get_db)):
+    usr = db.query(models.User).filter(models.User.id == users_id).first()
+    if usr:
+        if token == usr.token:
+            return usr.friends
+        raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=404, detail="User not found")
+
+
+@app.get("/users/{recipient_id}/request")
+def send_frequest(recipient_id: int, token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        sender = crud.get_user_by_email(db, token[:-256])
+
+        recpt = crud.get_user(db, recipient_id)
+        if recpt and recpt != sender:
+
+            if crud.get_frequest(db, sender.id, recipient_id):
+                raise HTTPException(
+                    status_code=400, detail="Already Requested By You")
+            if crud.get_frequest(db, recipient_id, sender.id):
+                raise HTTPException(
+                    status_code=400, detail="Already Requested By Other")
+            crud.add_frequest(db, sender.id, recipient_id)
+            return True
+        raise HTTPException(status_code=400, detail="Invalid")
+    raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/frequests")
+def get_frequests(token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        frqs = crud.get_users_frequests(db, user.id)
+        print(frqs)
+        return frqs
+
+    raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/frequests/{req_id}/accept")
+def accept_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        frq = db.query(models.Frequest).filter(
+            models.Frequest.id == req_id, models.Frequest.recipient == user.id, models.Frequest.status == 'pending').first()
+        if frq:
+            frq.status = 'accepted'
+            crud.add_friend(db, frq.sender, frq.recipient)
+            crud.add_friend(db, frq.recipient, frq.sender)
+            return 'OK'
+
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/frequests/{req_id}/reject")
+def reject_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        frq = db.query(models.Frequest).filter(
+            models.Frequest.id == req_id, models.Frequest.recipient == user.id, models.Frequest.status == 'pending').first()
+        if frq:
+            frq.status = 'rejected'
+            db.commit()
+            return 'OK'
+
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/frequests/{req_id}/remove")
+def reject_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        frq_pending = db.query(models.Frequest).filter(
+            models.Frequest.id == req_id, models.Frequest.sender == user.id, models.Frequest.status == 'pending').first()
+
+        frq_rejected = db.query(models.Frequest).filter(
+            models.Frequest.id == req_id, models.Frequest.recipient == user.id, models.Frequest.status == 'rejected').first()
+
+        if frq_pending:
+            frq = frq_pending
+        else:
+            frq = frq_rejected
+
+        if frq:
+
+            print(frq.id)
+
+            db.delete(frq)
+            db.commit()
+            return 'OK'
+
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/users/{user_id}/full", response_model=schemas.FullUser)
+def read_user(user_id: int, token: str, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if token == db_user.token:
+        return db_user
+    raise HTTPException(status_code=403, detail="Forbidden")
+
+
+@app.get("/users/{user_id}/unfriend")
+def remove_friend(token: str, user_id: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        friends = user.friends
+        for friend in friends:
+            if friend.friend_id == user_id:
+                crud.remove_friend(db, user.id, user_id)
+                return "OK"
+
+        raise HTTPException(status_code=404, detail="Friend not found")
+
+    raise HTTPException(status_code=403, detail="Forbidden")
 
 
 # DEVELOPMENT ONLY #########TODO###########################################################
@@ -149,3 +275,11 @@ def check(token: str, db: Session = Depends(get_db)):
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
+
+
+@app.get("/addfriend")
+def add_friend(user_id: int, friend_id: int, db: Session = Depends(get_db)):
+    #crud.add_friend(db, user_id, friend_id)
+    usr = db.query(models.User).filter(models.User.id == user_id).first()
+    for friend in usr.friends:
+        print(friend.friend_id)

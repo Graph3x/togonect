@@ -29,3 +29,17 @@ class EditableUser(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class FullUser(User):
+    email: str
+    token_expiration: int
+
+    class Config:
+        orm_mode = True
+
+
+class Frequest(BaseModel):
+    id: int
+    sender: int
+    recipient: int
