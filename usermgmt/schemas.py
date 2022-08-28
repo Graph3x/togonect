@@ -31,9 +31,18 @@ class EditableUser(BaseModel):
         orm_mode = True
 
 
+class Friend(BaseModel):
+    friend_id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+
 class FullUser(User):
     email: str
     token_expiration: int
+    friends: list[Friend] = []
 
     class Config:
         orm_mode = True

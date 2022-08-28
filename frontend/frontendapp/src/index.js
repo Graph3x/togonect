@@ -7,6 +7,7 @@ import LoginBlock from './components/loginBlock';
 import Profile from './components/profile';
 import EditPage from './components/editPage';
 import Homepage from './components/homepage';
+import FriendsPage from './components/friendsPage';
 
 
 const container = document.getElementById('root');
@@ -19,6 +20,7 @@ root.render(
                 <Route path='homepage/' element={<Homepage/>} />
                 <Route path='profile/:iden' element={<Profile/>} />
                 <Route path='profile/:iden/edit' element={<EditPage/>} />
+                <Route path='friends/' element={<FriendsPage/>} />
 
                 <Route path='*' element={<h1>404: Not Found</h1>} />
             </Route>

@@ -116,16 +116,11 @@ def get_frequest(db: Session, sender_id: int, recipient_id: int):
 
 
 def get_users_frequests(db: Session, user_id: int):
+
     frequests1 = db.query(models.Frequest).filter(
-        models.Frequest.sender == user_id, models.Frequest.status == 'pending').all()
+        models.Frequest.sender == user_id).all()
 
     frequests2 = db.query(models.Frequest).filter(
-        models.Frequest.sender == user_id, models.Frequest.status == 'rejected').all()
+        models.Frequest.recipient == user_id).all()
 
-    frequests3 = db.query(models.Frequest).filter(
-        models.Frequest.recipient == user_id, models.Frequest.status == 'pending').all()
-
-    frequests4 = db.query(models.Frequest).filter(
-        models.Frequest.recipient == user_id, models.Frequest.status == 'rejected').all()
-
-    return set(frequests1 + frequests2 + frequests3 + frequests4)
+    return set(frequests1 + frequests2)

@@ -130,10 +130,7 @@ def delete_token(user_id: int, token: str, db: Session = Depends(get_db)):
     raise HTTPException(status_code=403, detail="Forbidden")
 
 
-# IN PROGRESS #########TODO###########################################################
-
-
-@app.get("/users/{users_id}/friends")
+@app.get("/users/{users_id}/friends", response_model=list[schemas.Friend])
 def get_friends(users_id: int, token: str, db: Session = Depends(get_db)):
     usr = db.query(models.User).filter(models.User.id == users_id).first()
     if usr:
@@ -168,7 +165,6 @@ def get_frequests(token: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         user = crud.get_user_by_email(db, token[:-256])
         frqs = crud.get_users_frequests(db, user.id)
-        print(frqs)
         return frqs
 
     raise HTTPException(status_code=403, detail="Forbidden")
@@ -207,8 +203,8 @@ def reject_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=403, detail="Forbidden")
 
 
-@app.get("/frequests/{req_id}/remove")
-def reject_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
+@app.get("/frequests/{req_id}/cancel")
+def remove_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         user = crud.get_user_by_email(db, token[:-256])
         frq_pending = db.query(models.Frequest).filter(
@@ -221,11 +217,7 @@ def reject_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
             frq = frq_pending
         else:
             frq = frq_rejected
-
         if frq:
-
-            print(frq.id)
-
             db.delete(frq)
             db.commit()
             return 'OK'
@@ -252,12 +244,26 @@ def remove_friend(token: str, user_id: int, db: Session = Depends(get_db)):
         friends = user.friends
         for friend in friends:
             if friend.friend_id == user_id:
+                frq1 = db.query(models.Frequest).filter(
+                    models.Frequest.sender == user.id, models.Frequest.recipient == user_id).first()
+                frq2 = db.query(models.Frequest).filter(
+                    models.Frequest.sender == user_id, models.Frequest.recipient == user.id).first()
+
+                if frq1:
+                    frq = frq1
+                else:
+                    frq = frq2
+
+                db.delete(frq)
                 crud.remove_friend(db, user.id, user_id)
                 return "OK"
 
         raise HTTPException(status_code=404, detail="Friend not found")
 
     raise HTTPException(status_code=403, detail="Forbidden")
+
+
+# IN PROGRESS ##############TODO###########################################################
 
 
 # DEVELOPMENT ONLY #########TODO###########################################################
@@ -271,7 +277,7 @@ def check(token: str, db: Session = Depends(get_db)):
         return 'Denied'
 
 
-@app.get("/users/", response_model=list[schemas.User])
+@app.get("/users/", response_model=list[schemas.FullUser])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
