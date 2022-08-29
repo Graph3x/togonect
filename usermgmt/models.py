@@ -1,6 +1,27 @@
+from sqlalchemy import Table
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from database import Base
 from sqlalchemy.orm import relationship
+
+
+usergames = Table('user_games', Base.metadata,
+                  Column('user_id', Integer, ForeignKey(
+                      "users.id"), primary_key=True),
+                  Column('game_id', Integer, ForeignKey(
+                      "games.id"), primary_key=True)
+                  )
+
+
+class Game(Base):
+
+    __tablename__ = 'games'
+
+    id = Column(Integer, primary_key=True, index=True)
+    cover = Column(String, unique=False, nullable=True)
+    name = Column(String, unique=False, nullable=True)
+
+    users = relationship("User", back_populates="games",
+                         secondary='user_games')
 
 
 class User(Base):
@@ -18,6 +39,8 @@ class User(Base):
     profile_picture = Column(String, nullable=True)
 
     friends = relationship("Friend", back_populates="user")
+    games = relationship("Game", back_populates="users",
+                         secondary='user_games')
 
 
 class Friend(Base):

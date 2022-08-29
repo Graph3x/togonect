@@ -265,6 +265,61 @@ def remove_friend(token: str, user_id: int, db: Session = Depends(get_db)):
 
 # IN PROGRESS ##############TODO###########################################################
 
+@app.get('/games/search', response_model=list[schemas.Game])
+def search_game(name: str):
+    games = utils.search_game(name)
+    gamesort = sorted(games, key=lambda d: d['id'])
+    return gamesort
+
+
+@app.get('/games/{iden}', response_model=schemas.Game)
+def get_game(iden: int, db: Session = Depends(get_db)):
+    in_db = crud.get_game(db, iden)
+    if in_db:
+        return in_db
+    remote = utils.get_remote_game(iden)
+    if remote == []:
+        raise HTTPException(404, 'Game not found')
+    new_game = crud.add_game(db, remote[0])
+    return new_game
+
+
+@app.get('/games/{gid}/add}')
+def add_game(gid: int, token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        game = crud.get_game(db, gid)
+        if game in user.games:
+            raise HTTPException(400, 'Game Already Added')
+        if game:
+            crud.add_user_game(db, user, game)
+            return 'OK'
+        remote = utils.get_remote_game(gid)
+        if remote == []:
+            raise HTTPException(404, 'Game not found')
+        new_game = crud.add_game(db, remote[0])
+        crud.add_user_game(db, user, new_game)
+        return 'OK'
+    raise HTTPException(403, 'Forbidden')
+
+
+@app.get('/games/{gid}/remove}')
+def remove_game(gid: int, token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        game = crud.get_game(db, gid)
+        if game not in user.games:
+            raise HTTPException(400, 'Game Not Added')
+        if game:
+            crud.remove_user_game(db, user, game)
+            return 'OK'
+        remote = utils.get_remote_game(gid)
+        if remote == []:
+            raise HTTPException(404, 'Game not found')
+        crud.remove_user_game(db, user, game)
+        return 'OK'
+    raise HTTPException(403, 'Forbidden')
+
 
 # DEVELOPMENT ONLY #########TODO###########################################################
 

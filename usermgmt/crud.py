@@ -124,3 +124,52 @@ def get_users_frequests(db: Session, user_id: int):
         models.Frequest.recipient == user_id).all()
 
     return set(frequests1 + frequests2)
+
+
+def get_game(db: Session, iden: int):
+    try:
+        return db.query(models.Game).filter(models.Game.id == iden).first()
+    except Exception:
+        return False
+
+
+def add_game(db: Session, game: dict):
+
+    fcover = -1
+    if 'cover' in game.keys():
+        fcover = int(game['cover'])
+
+    try:
+        new_game = models.Game(
+            id=game['id'], name=game['name'], cover=utils.get_remote_cover(fcover))
+        db.add(new_game)
+        db.commit()
+        db.refresh(new_game)
+
+        return new_game
+
+    except Exception as e:
+        print(e)
+        return False
+
+
+def add_user_game(db: Session, user: models.User, game: models.Game):
+    try:
+        user.games.append(game)
+        db.commit()
+
+        return True
+
+    except Exception:
+        return False
+
+
+def remove_user_game(db: Session, user: models.User, game: models.Game):
+    try:
+        user.games.remove(game)
+        db.commit()
+
+        return True
+
+    except Exception as e:
+        return False

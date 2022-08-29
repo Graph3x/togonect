@@ -21,5 +21,8 @@ class Settings:
 
     ADMIN_TOKEN: str = os.getenv("ADMIN_TOKEN")
 
+    TWITCH_ID: str = os.getenv("TWITCH_ID")
+    TWITCH_SECRET: str = os.getenv("TWITCH_SECRET")
+
 
 settings = Settings()

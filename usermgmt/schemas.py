@@ -1,6 +1,15 @@
 from pydantic import BaseModel
 
 
+class Game(BaseModel):
+    id: int
+    cover: str = 'nocover'
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
 class UserBase(BaseModel):
     username: str
     profile_picture: str
@@ -19,6 +28,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
+    games: list[Game] = []
 
     class Config:
         orm_mode = True
