@@ -62,7 +62,7 @@ class FrqCard extends Component {
     return (
     <div>
         <NavLink to={'/profile/' + this.state.other_id}>
-            <img src={this.state.userdata.profile_picture} alt='Profile picture' height={100} width={100}/>
+            <img src={this.state.userdata.profile_picture} alt='Profile picture' height={100} width={100} referrerPolicy="no-referrer"/>
         </NavLink>
         {this.renderFrqCard()}
     </div>

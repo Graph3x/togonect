@@ -44,7 +44,7 @@ def search_game(name: str):
         'Authorization': 'Bearer q0jy1ydsf7ogzelthcrqbzxh55y5mz',
     }
 
-    body = f'search "{name}"; fields name, cover;'
+    body = f'search "{name}"; fields name, cover; limit 4;'
 
     response = requests.post(
         'https://api.igdb.com/v4/games', data=body, headers=headers)

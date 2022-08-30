@@ -1,4 +1,4 @@
-import {React, Component} from 'react';
+import {React, Component, Fragment} from 'react';
 import { useParams } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import OptionsMenu from './optionsMenu';
@@ -17,7 +17,8 @@ class Profile extends Component {
         userdata : 'None',
         id : 'None',
         render_options: false,
-        frqs: []
+        frqs: [],
+        games: [],
     }
 
   componentDidMount() {
@@ -30,7 +31,8 @@ class Profile extends Component {
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString())
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({userdata:jsondata})})
+    .then((jsondata) => {this.setState({userdata:jsondata}); return jsondata})
+    .then((jsondata) => {this.setState({games:jsondata.games})})
   }
 
 
@@ -77,6 +79,17 @@ class Profile extends Component {
   }
 
 
+  gameElement = (game) => {
+    return(
+        <Fragment key={game.id}>
+          <NavLink to={'/games/' + game.id}>
+            <img src={game.cover}/>
+          </NavLink>
+        </Fragment>
+    )
+  }
+
+
   render() {
     return (
         <div id='profile'>
@@ -84,8 +97,9 @@ class Profile extends Component {
             {this.renderOptions()}
             {this.renderButton()}
             <br/>
-            <img src={this.state.userdata.profile_picture} alt='Profile picture' height={300} width={300}/>
+            <img src={this.state.userdata.profile_picture} referrerPolicy="no-referrer" alt='Profile picture' height={300} width={300}/>
             <h1>{this.state.userdata.username}</h1>
+            {this.state.games.map(g => this.gameElement(g))}
         </div>
   );
   }

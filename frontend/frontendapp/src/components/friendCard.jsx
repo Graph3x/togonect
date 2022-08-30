@@ -24,7 +24,7 @@ class FriendCard extends Component {
     return (
     <div>
         <NavLink to={'/profile/' + this.props.iden}>
-            <img src={this.state.userdata.profile_picture} alt='Profile picture' height={100} width={100}/>
+            <img src={this.state.userdata.profile_picture} alt='Profile picture' height={100} width={100} referrerPolicy="no-referrer"/>
         </NavLink>
     </div>
   );

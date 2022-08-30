@@ -20,3 +20,11 @@
     border-radius: 20px;
     background: white;
 }
+
+.hide_element {
+    display: none
+}
+
+.gameX:hover {
+    opacity: 30%;
+}

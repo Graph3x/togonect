@@ -284,7 +284,7 @@ def get_game(iden: int, db: Session = Depends(get_db)):
     return new_game
 
 
-@app.get('/games/{gid}/add}')
+@app.get('/games/{gid}/add')
 def add_game(gid: int, token: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         user = crud.get_user_by_email(db, token[:-256])
@@ -303,7 +303,7 @@ def add_game(gid: int, token: str, db: Session = Depends(get_db)):
     raise HTTPException(403, 'Forbidden')
 
 
-@app.get('/games/{gid}/remove}')
+@app.get('/games/{gid}/remove')
 def remove_game(gid: int, token: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         user = crud.get_user_by_email(db, token[:-256])

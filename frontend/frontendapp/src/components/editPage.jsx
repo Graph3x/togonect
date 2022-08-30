@@ -2,6 +2,8 @@ import {React, Component, Fragment} from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import DeleteUserButton from './deleteUserButton';
 import ResetTokenButton from './resetTokenButton';
+import '../styles.css'
+import {SelectGameAddPopup} from './popup';
 
 
 function withParams(Component) {
@@ -15,7 +17,9 @@ class EditPage extends Component {
         userdata : 'None',
         id : 'None',
         value : '',
-        redirect: false
+        redirect: false,
+        games: [],
+        showPopup: false,
     }
 
   componentDidMount() {
@@ -28,7 +32,8 @@ class EditPage extends Component {
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString())
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({userdata:jsondata})})
+    .then((jsondata) => {this.setState({userdata:jsondata}); return jsondata})
+    .then((jsondata) => {this.setState({games:jsondata.games})})
   }
 
   handleChange(event) {this.setState({value: event.target.value});}
@@ -60,8 +65,26 @@ class EditPage extends Component {
     this.setRedirect();
   }
 
-  temp = () => {if(this.state.value) {alert('yep')}}
-  
+  removeGame = (gid) => {
+    let path = 'http://localhost:8000/games/' + gid + '/remove?token=' + localStorage.getItem('token');
+    fetch(path)
+    .then((response) => {return response.json();})
+    .then((jsondata) => {window.location.reload();})
+  }
+
+  gameElement = (game) => {
+    return(
+        <Fragment key={game.id}>
+          <button onClick={() => this.removeGame(game.id)}>
+            <img className='gameX' src={game.cover}/>
+          </button>
+        </Fragment>
+    )
+  }
+
+  togglePopup = () => {
+    this.setState({showPopup: !this.state.showPopup});
+  }
 
   render() {
     return (
@@ -72,6 +95,11 @@ class EditPage extends Component {
             <input type="text" value={this.state.value} onChange={this.handleChange} placeholder={this.state.userdata.username}/>
           </form>
           <button onClick={this.handleSave}>SAVE</button>
+          <div>
+            {this.state.games.map(g => this.gameElement(g))}
+            <button onClick={this.togglePopup}>ADD GAME</button>
+            {this.state.showPopup ? <SelectGameAddPopup closePopup={this.togglePopup.bind(this)}/>: null}
+          </div>
         </div>
         <div id='danger_edit'>
           <br/>
