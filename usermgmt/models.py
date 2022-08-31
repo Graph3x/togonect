@@ -1,5 +1,5 @@
 from sqlalchemy import Table
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from database import Base
 from sqlalchemy.orm import relationship
 
@@ -24,6 +24,19 @@ class Game(Base):
                          secondary='user_games')
 
 
+class Invite(Base):
+
+    __tablename__ = 'invites'
+
+    id = Column(Integer, primary_key=True, index=True)
+    game_id = Column(Integer, unique=False, nullable=False)
+    author_id = Column(Integer, unique=True, nullable=False)
+    slots = Column(Integer, unique=False, nullable=True)
+    time = Column(DateTime, unique=False, nullable=True)
+
+    users = relationship("User", back_populates="invite")
+
+
 class User(Base):
 
     __tablename__ = 'users'
@@ -41,6 +54,8 @@ class User(Base):
     friends = relationship("Friend", back_populates="user")
     games = relationship("Game", back_populates="users",
                          secondary='user_games')
+    invite_id = Column(Integer, ForeignKey("invites.id"), nullable=True)
+    invite = relationship("Invite", back_populates="users")
 
 
 class Friend(Base):

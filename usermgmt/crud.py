@@ -1,4 +1,4 @@
-from operator import and_
+from datetime import time
 from sqlalchemy.orm import Session
 import sqlalchemy
 import models
@@ -172,4 +172,57 @@ def remove_user_game(db: Session, user: models.User, game: models.Game):
         return True
 
     except Exception as e:
+        return False
+
+
+def add_invite(db: Session, author: models.User, gameid: int, slots: int = None, time: time = None):
+    try:
+        invite = models.Invite(
+            game_id=gameid, author_id=author.id)
+        if slots:
+            invite.slots = slots
+        if time:
+            invite.time = time
+        invite.users.append(author)
+        db.add(invite)
+        db.commit()
+        db.refresh(invite)
+
+        return True
+
+    except Exception as e:
+        print(e)
+        return False
+
+
+def get_invite(db: Session, iden: int):
+    try:
+        return db.query(models.Invite).filter(models.Invite.id == iden).first()
+    except Exception:
+        return False
+
+
+def remove_invite(db: Session, invite: models.Invite):
+    try:
+        db.delete(invite)
+        db.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def join_event(db: Session, user: models.User, event: models.Invite):
+    try:
+        user.invite = event
+        db.commit()
+    except Exception:
+        return False
+
+
+def leave_event(db: Session, user: models.User):
+    try:
+        user.invite = None
+        db.commit()
+    except Exception:
         return False

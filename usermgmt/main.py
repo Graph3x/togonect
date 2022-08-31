@@ -263,8 +263,6 @@ def remove_friend(token: str, user_id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=403, detail="Forbidden")
 
 
-# IN PROGRESS ##############TODO###########################################################
-
 @app.get('/games/search', response_model=list[schemas.Game])
 def search_game(name: str):
     games = utils.search_game(name)
@@ -320,6 +318,98 @@ def remove_game(gid: int, token: str, db: Session = Depends(get_db)):
         return 'OK'
     raise HTTPException(403, 'Forbidden')
 
+
+# IN PROGRESS ##############TODO###########################################################
+
+@app.post('/invites/add')
+def add_invite(token: str, invite_data: schemas.CreateInvite, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        game = crud.get_game(db, invite_data.game_id)
+        if game not in user.games:
+            raise HTTPException(400, 'Game Not Added')
+        if game:
+            invite = crud.add_invite(db, user, game.id,
+                                     invite_data.slots, invite_data.time)
+            if invite:
+                return 'OK'
+            raise HTTPException(400, 'Bad Request')
+        raise HTTPException(404, 'Game not found')
+    raise HTTPException(403, 'Forbidden')
+
+
+@app.get('/invites/{iden}/cancel')
+def cancel_invite(token: str, iden: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        invite = crud.get_invite(db, iden)
+        if not invite:
+            raise HTTPException(404, 'Invite not found')
+        if invite.author_id == user.id:
+            crud.remove_invite(db, invite)
+            return 'OK'
+
+    raise HTTPException(403, 'Forbidden')
+
+
+@app.get('/invites', response_model=list[schemas.Invite])
+def get_invites(token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        invites = []
+        for friend in user.friends:
+            uf = crud.get_user(db, friend.friend_id)
+            if uf.invite:
+                game = crud.get_game(db, uf.invite.game_id)
+                if game in user.games:
+                    invites.append(uf.invite)
+
+        return invites
+    raise HTTPException(403, 'Forbidden')
+
+
+@app.get('/invites/{iden}', response_model=schemas.Invite)
+def get_invite(token: str, iden: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        invite = db.query(models.Invite).filter(
+            models.Invite.id == iden).first()
+        if not invite:
+            raise HTTPException(404, 'Invite not found')
+        return invite
+
+    raise HTTPException(403, 'Forbidden')
+
+
+@app.get('/invites/{iden}/join')
+def join_event(token: str, iden: int, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        invite = crud.get_invite(db, iden)
+        if not invite:
+            raise HTTPException(404, 'Invite not found')
+        if invite.author_id == user.id:
+            raise HTTPException(400, 'You are the author')
+        if user.invite == None:
+            crud.join_event(db, user, invite)
+            return 'OK'
+
+    raise HTTPException(403, 'Forbidden')
+
+
+@app.get('/invites/leave')
+def leave_event(token: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        user = crud.get_user_by_email(db, token[:-256])
+        invite = user.invite
+        if not invite:
+            raise HTTPException(404, 'Invite not found')
+        if invite.author_id == user.id:
+            raise HTTPException(400, 'You are the author')
+        if user.invite != None:
+            crud.leave_event(db, user)
+            return 'OK'
+
+    raise HTTPException(403, 'Forbidden')
 
 # DEVELOPMENT ONLY #########TODO###########################################################
 

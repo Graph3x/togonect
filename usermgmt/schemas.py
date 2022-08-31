@@ -1,4 +1,11 @@
+from datetime import datetime
 from pydantic import BaseModel
+
+
+class CreateInvite(BaseModel):
+    game_id: int
+    time: datetime = None
+    slots: int = None
 
 
 class Game(BaseModel):
@@ -18,6 +25,23 @@ class UserBase(BaseModel):
         orm_mode = True
 
 
+class InviteUser(UserBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        orm_mode = True
+
+
+class Invite(CreateInvite):
+    id: int
+    author_id: int
+    users: list[InviteUser]
+
+    class Config:
+        orm_mode = True
+
+
 class UserCreate(UserBase):
     email: str
     token: str
@@ -29,6 +53,7 @@ class User(UserBase):
     id: int
     is_active: bool
     games: list[Game] = []
+    invite: Invite = None
 
     class Config:
         orm_mode = True
