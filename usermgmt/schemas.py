@@ -78,6 +78,7 @@ class FullUser(User):
     email: str
     token_expiration: int
     friends: list[Friend] = []
+    invite: Invite = None
 
     class Config:
         orm_mode = True

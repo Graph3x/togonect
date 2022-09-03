@@ -9,6 +9,7 @@ import EditPage from './components/editPage';
 import Homepage from './components/homepage';
 import FriendsPage from './components/friendsPage';
 import GamePage from './components/gamePage';
+import AddInvPage from './components/addInvPage';
 
 
 const container = document.getElementById('root');
@@ -23,6 +24,7 @@ root.render(
                 <Route path='profile/:iden/edit' element={<EditPage/>} />
                 <Route path='friends/' element={<FriendsPage/>} />
                 <Route path='games/:iden' element={<GamePage/>} />
+                <Route path='sendinv' element={<AddInvPage/>} />
 
                 <Route path='*' element={<h1>404: Not Found</h1>} />
             </Route>

@@ -389,6 +389,9 @@ def join_event(token: str, iden: int, db: Session = Depends(get_db)):
             raise HTTPException(404, 'Invite not found')
         if invite.author_id == user.id:
             raise HTTPException(400, 'You are the author')
+        if invite.slots and invite.users:
+            if len(invite.users) >= invite.slots:
+                raise HTTPException(400, 'Event is full')
         if user.invite == None:
             crud.join_event(db, user, invite)
             return 'OK'
@@ -396,8 +399,8 @@ def join_event(token: str, iden: int, db: Session = Depends(get_db)):
     raise HTTPException(403, 'Forbidden')
 
 
-@app.get('/invites/leave')
-def leave_event(token: str, db: Session = Depends(get_db)):
+@app.get('/invites/{iden}/leave')
+def leave_event(token: str, iden: int, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         user = crud.get_user_by_email(db, token[:-256])
         invite = user.invite
