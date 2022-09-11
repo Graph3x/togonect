@@ -48,6 +48,13 @@ class Profile extends Component {
   }
 
 
+  unblock = (frq) => {
+    fetch('http://localhost:8000/frequests/' + frq.id + '/cancel?token=' + localStorage.getItem('token'))
+    .then((response) => {return response.json();})
+    .then((r) => {window.location.reload();})
+  }
+
+
   renderButton = () => {
     if(this.state.id == localStorage.getItem('togo_id')) {
       let path = '/profile/' + localStorage.getItem('togo_id') + '/edit'
@@ -60,10 +67,17 @@ class Profile extends Component {
         return <UnFriendButton friend_id={this.state.id}/>
       }
       if(frq.status == 'pending'){
+        if(frq.sender == this.state.userdata.id){
+          return <NavLink to={'/friends'}>Accept/Reject</NavLink>
+        }
         return <NavLink to={'/friends'}>Invited</NavLink>
       }
       if(frq.status == 'rejected'){
-        return <NavLink to={'/friends'}>Blocked</NavLink>
+        if(frq.sender == this.state.userdata.id){
+          return <button onClick={() => {this.unblock(frq)}}>Unblock</button>
+        }
+
+        return <p>Blocking You</p>
       }
     }
     return <AddFriendButton friend_id={this.state.id}/>

@@ -52,12 +52,11 @@ app.add_middleware(
 
 
 @app.get("/auth")
-def authentication(token: str, db: Session = Depends(get_db)):
+def authentication(token, db: Session = Depends(get_db)):
+
     try:
         user = id_token.verify_oauth2_token(token, requests.Request(
         ), "482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com")
-
-        print(user['picture'])
 
         if user['email_verified']:
             user_in_db = crud.get_user_by_email(db, user['email'])
@@ -319,8 +318,6 @@ def remove_game(gid: int, token: str, db: Session = Depends(get_db)):
     raise HTTPException(403, 'Forbidden')
 
 
-# IN PROGRESS ##############TODO###########################################################
-
 @app.post('/invites/add')
 def add_invite(token: str, invite_data: schemas.CreateInvite, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
@@ -413,6 +410,25 @@ def leave_event(token: str, iden: int, db: Session = Depends(get_db)):
             return 'OK'
 
     raise HTTPException(403, 'Forbidden')
+
+
+# IN PROGRESS ##############TODO###########################################################
+
+@app.get('/search')
+def search(token: str, query: str, db: Session = Depends(get_db)):
+    if utils.validate_token(db, token):
+        email_usrs = crud.get_full_user_by_email(db, query)
+        name_usrs = crud.get_user_by_name(db, query)
+        games = utils.search_game(query)
+        gamesort = sorted(games, key=lambda d: d['id'])
+
+        result = [email_usrs]
+        result.append(name_usrs)
+        result.append(gamesort)
+        return result
+
+    else:
+        raise HTTPException(403, 'Forbidden')
 
 # DEVELOPMENT ONLY #########TODO###########################################################
 

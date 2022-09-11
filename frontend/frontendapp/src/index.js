@@ -10,6 +10,7 @@ import Homepage from './components/homepage';
 import FriendsPage from './components/friendsPage';
 import GamePage from './components/gamePage';
 import AddInvPage from './components/addInvPage';
+import SearchPage from './components/searchPage';
 
 
 const container = document.getElementById('root');
@@ -25,6 +26,7 @@ root.render(
                 <Route path='friends/' element={<FriendsPage/>} />
                 <Route path='games/:iden' element={<GamePage/>} />
                 <Route path='sendinv' element={<AddInvPage/>} />
+                <Route path='search' element={<SearchPage/>} />
 
                 <Route path='*' element={<h1>404: Not Found</h1>} />
             </Route>

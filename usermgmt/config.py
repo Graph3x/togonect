@@ -8,7 +8,7 @@ load_dotenv(dotenv_path=env_path)
 
 class Settings:
     PROJECT_NAME: str = "OneGame"
-    PROJECT_VERSION: str = "0.0.4"
+    PROJECT_VERSION: str = "0.0.5"
     FRONTEND_ORIGIN: str = "http://localhost:3000"
     TOKEN_LEN: int = 256
 

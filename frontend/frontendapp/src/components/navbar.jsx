@@ -8,6 +8,7 @@ class Navbar extends Component {
        friendsPath: '/friends',
        homePath: '/homepage',
        profilePath: '/', 
+       searchPath: '/search',
     }
 
     componentDidMount() {
@@ -18,8 +19,9 @@ class Navbar extends Component {
   render() {
     return (
         <div id='navbar'>
-            <NavLink to={this.state.friendsPath} >FRIENDS</NavLink>
-            <NavLink to={this.state.homePath}>HOMEPAGE</NavLink>
+            <NavLink to={this.state.friendsPath} >FRIENDS </NavLink>
+            <NavLink to={this.state.homePath}>HOMEPAGE </NavLink>
+            <NavLink to={this.state.searchPath}>SEARCH </NavLink>
             <NavLink to={this.state.profilePath} reloadDocument={true}>PROFILE</NavLink>
         </div>
   );

@@ -226,3 +226,15 @@ def leave_event(db: Session, user: models.User):
         db.commit()
     except Exception:
         return False
+
+
+def get_user_by_name(db: Session, name: str):
+    return db.query(models.User).filter(models.User.username == name).all()
+
+
+def get_full_user_by_email(db: Session, mail: str):
+    return db.query(models.User).filter(models.User.email == mail).all()
+
+
+def get_game_by_name(db: Session, name: str):
+    return db.query(models.Game).filter(models.Game.name == name).all()
