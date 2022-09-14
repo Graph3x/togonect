@@ -1,7 +1,6 @@
 import {React, Component} from 'react';
 import { Navigate } from 'react-router-dom';
 import GoogleButton from './googleButton';
-import TestButton from './testButton';
 
 
 class LoginBlock extends Component {
@@ -21,11 +20,9 @@ class LoginBlock extends Component {
 
   render() {
     return (
-        <div id='google_login'>
+        <div>
             {this.renderRedirect()}
-            <GoogleButton></GoogleButton>
-            <br />
-            <TestButton></TestButton>
+            <GoogleButton/>
         </div>
   );
   }

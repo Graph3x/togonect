@@ -38,8 +38,8 @@ class InviteCard extends Component {
   gameElement = (game) => {
     return(
         <Fragment key={game.id}>
-          <NavLink to={'/games/' + game.id}>
-            <img src={game.cover}/>
+          <NavLink to={'/events/' + this.props.invite.id}>
+            <img src={game.cover} className='invite_game'/>
           </NavLink>
         </Fragment>
     )
@@ -74,26 +74,26 @@ class InviteCard extends Component {
 
   getTime = () => {
     if(this.props.invite.time){
-        return <h3>{this.props.invite.time}</h3>
+        return <h3 className='invite_time'>{this.props.invite.time}</h3>
     }
-    return <h3>No Time</h3>
+    return <h3 className='invite_time'>No Time</h3>
   }
 
   renderButton = () => {
     if(this.state.author.id == this.props.udata.id){
-      return <button onClick={this.cancel}>CANCEL</button>
+      return <button onClick={this.cancel} className='invite_button btn'>CANCEL</button>
     }
 
 
     if(this.state.freeSlots < 1 && this.state.freeSlots > -1) {
-      return <p>FULL</p>
+      return <p className='invite_button btn'>FULL</p>
     }
 
     if (this.props.udata.invite == null){
-      return <button onClick={this.join}>JOIN</button>
+      return <button onClick={this.join} className='invite_button btn'>JOIN</button>
       }
     if (this.props.udata.invite.id == this.props.invite.id){
-        return <button onClick={this.leave}>LEAVE</button>
+        return <button onClick={this.leave} className='invite_button btn'>LEAVE</button>
     }
     
   }
@@ -101,18 +101,18 @@ class InviteCard extends Component {
   renderSlots = () => {
 
     if(this.state.freeSlots <= -1){
-      return <h3>Unlimited Slots</h3>
+      return <h3 className='invite_slots'>Unlimited</h3>
     }
 
-    return <h3>{this.state.freeSlots}/{this.props.invite.slots}</h3>
+    return <h3 className='invite_slots'>{this.state.freeSlots}/{this.props.invite.slots}</h3>
   }
 
 
   render() {
     return (
-    <div>
+    <div className='invite'>
         {this.gameElement(this.state.game)}
-        <h3>{this.state.author.username}</h3>
+        <h3 className='invite_name'>{this.state.author.username}</h3>
         {this.renderSlots()}
         {this.getTime()}
         {this.renderButton()}

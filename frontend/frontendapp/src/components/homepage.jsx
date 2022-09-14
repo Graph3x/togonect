@@ -38,7 +38,7 @@ class Homepage extends Component {
 
   renderAddInv = () => {
     if(this.state.userdata.invite == null) {
-      return <NavLink to={'/sendinv'}>SEND INVITE</NavLink>
+      return <NavLink to={'/sendinv'} className='btn' id='send_inv_btn'>SEND INVITE</NavLink>
     }
   }
 
@@ -46,10 +46,11 @@ class Homepage extends Component {
     render() {  
         return (  
             <div>
-                {this.renderInvite()}
                 {this.renderAddInv()}
-                {this.state.invites.map(i => <InviteCard invite={i} udata={this.state.userdata} key={i.id}/>)}
-                
+                <div id='invites_div'>
+                  {this.renderInvite()}
+                  {this.state.invites.map(i => <InviteCard invite={i} udata={this.state.userdata} key={i.id}/>)}
+                </div>
                 
             </div>
         );  

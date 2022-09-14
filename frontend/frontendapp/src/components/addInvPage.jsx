@@ -87,18 +87,18 @@ class AddInvPage extends Component {
 
   unlimitedButton = () => {
     if(this.state.useSlots){
-      return <button onClick={() => {this.setState({useSlots: !this.state.useSlots})}}>UNLIMITED</button>
+      return <button className='btn' onClick={() => {this.setState({useSlots: !this.state.useSlots})}}>UNLIMITED</button>
     }
-    return <button onClick={() => {this.setState({useSlots: !this.state.useSlots})}}>LIMITED</button>
+    return <button className='btn' onClick={() => {this.setState({useSlots: !this.state.useSlots})}}>LIMITED</button>
   }
 
   slotsSelector = () => {
     if(this.state.useSlots){
       return (
         <div>
-          <button onClick={() => {this.setState({slots: this.state.slots + 1})}}>+</button>
+          <button  className='btn' onClick={() => {this.setState({slots: this.state.slots + 1})}}>+</button>
           <h3>{this.state.slots}</h3>
-          <button onClick={this.minusButton}>-</button>
+          <button className='btn' onClick={this.minusButton}>-</button>
         </div>
       )
     }
@@ -110,7 +110,7 @@ class AddInvPage extends Component {
     if(this.state.stage == 0) {
         return (
             <div id='game'>
-              <h2>SELECT GAME</h2>
+              <h2 className='title'>SELECT GAME</h2>
                 {this.state.games.map(g => this.gameElement(g))}
             </div>
         )
@@ -120,9 +120,10 @@ class AddInvPage extends Component {
 
         return (
             <div id='slots'>
+              <h2 className='title'>SELECT NUMBER OF PLAYERS</h2>
               {this.slotsSelector()}
               {this.unlimitedButton()}
-              <button onClick={() => {this.setState({stage: this.state.stage + 1})}}>NEXT</button>
+              <button className='btn' onClick={() => {this.setState({stage: this.state.stage + 1})}}>NEXT</button>
             </div>
         )
     }

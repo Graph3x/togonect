@@ -19,10 +19,22 @@ class Navbar extends Component {
   render() {
     return (
         <div id='navbar'>
-            <NavLink to={this.state.friendsPath} >FRIENDS </NavLink>
-            <NavLink to={this.state.homePath}>HOMEPAGE </NavLink>
-            <NavLink to={this.state.searchPath}>SEARCH </NavLink>
-            <NavLink to={this.state.profilePath} reloadDocument={true}>PROFILE</NavLink>
+            <NavLink to={this.state.friendsPath} className='navelement'>
+              <h2 className='navelement'>FRIENDS</h2>
+            </NavLink>
+
+            <NavLink to={this.state.homePath} className='navelement'>
+              <h2 className='navelement'>HOME</h2>
+            </NavLink>
+
+            <NavLink to={this.state.searchPath} className='navelement'>
+              <h2 className='navelement'>SEARCH</h2>
+            </NavLink>
+
+            <NavLink to={this.state.profilePath} reloadDocument={true} className='navelement'>
+              <h2 className='navelement'>PROFILE</h2>
+            </NavLink>
+
         </div>
   );
   }

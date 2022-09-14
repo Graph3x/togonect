@@ -47,7 +47,7 @@ class DeleteUserButton extends Component {
     return (
     <div>
         {this.renderRedirect()}
-        <button onClick={this.togglePopup.bind(this)}>DELETE ACCOUNT</button>
+        <button onClick={this.togglePopup.bind(this)} className='danger_button'>DELETE ACCOUNT</button>
         {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO DELETE YOUR ACCOUNT, ARE YOU SURE?'
         cancelPopup={this.togglePopup.bind(this)} confirmPopup={this.confirm}/> : null}
     </div>

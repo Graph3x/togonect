@@ -1,3 +1,263 @@
+:root {
+    --color1: #181a17;
+    --color2: blue;
+    --color3: orangered;
+    --color12: #2b2e29;
+}
+
+
+* {
+    margin: 0;
+    padding: 0px;
+    border: 0px;
+    color: var(--color3);
+    background-color: var(--color1);
+}
+
+
+.general_button {
+    position: relative;
+    margin: 5px;
+}
+
+#edit_button {
+    right: 0px;
+    position: absolute;
+    margin: 5px;
+}
+
+#save_profile_button {
+    border: 3px solid var(--color2);
+    color: var(--color2);
+    font-size: 20px;
+    width: 60px;
+    height: 40px;
+    margin-top: 5px;
+    text-align: center;
+    margin-left: -25px;
+    background: var(--color12);
+}
+
+#games_div {
+    position: absolute;
+    margin-top: 400px;
+}
+
+#nickname {
+    position: relative;
+    color: var(--color2);
+    background: transparent;
+    text-align: center;
+    width: 100%;
+    left: -50%;
+    margin-top: 320px;
+    height: 0;
+}
+
+#navbar {
+    width: 100%;
+    background: var(--color12);
+    height: 50px;
+}
+
+.profile_game {
+    position: relative;
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    border: 5px solid var(--color2);
+    left: -50%;
+}
+
+.edit_game_btn {
+    position: relative;
+    left: -50%;
+    display: inline-block;
+}
+
+.google_login {
+    
+    width: 250px;
+    height: 100px;
+}
+
+.btn {
+    border: 3px solid var(--color2);
+    color: var(--color2);
+    font-size: 20px;
+    text-align: center;
+    background: var(--color12);
+    text-decoration: none;
+}
+
+#invites_div {
+    margin-top: 60px;
+}
+
+.border {
+    border: solid 5px yellow;
+}
+
+.invite {
+    border: solid 3px var(--color3);
+    height: 142px;
+    width: 60vw;
+    margin-left: 20vw;
+}
+
+.title {
+    text-align: center;
+    left: 50vw;
+    font-size: 40px;
+}
+
+.invite_game {
+    height: 140px;
+    width: 140px;
+    border-radius: 10%;
+}
+
+.invite_name {
+    position: relative;
+    display: inline-block;
+    top: -100px;
+    font-size: 40px;
+    background: var(--color12);
+    width: 45vw;
+    text-align: center;
+}
+
+.invite_slots {
+    position: relative;
+    display: inline-block;
+    top: -25px;
+    left: -40vw;
+    font-size: 60px;
+    text-align: center;
+}
+
+.invite_time {
+    position: relative;
+    display: inline-block;
+    top: -90px;
+    font-size: 40px;
+    left: 35vw;
+}
+
+.invite_button {
+    position: relative;
+    display: inline-block;
+    font-size: 40px;
+    top: -155px;
+    left: 30vw;
+}
+
+#send_inv_btn {
+    margin-left: 10px;
+    position: absolute;
+    margin-top: -47px;
+    padding: 3px;
+}
+
+.navelement {
+    height: 50px;
+    display: inline-block;
+    background: var(--color12);
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 5px;
+    height: 50%;
+    margin-left: 6vw;
+
+}
+
+.center_holder {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    top: 10%;
+    left: 50%;
+    overflow: visible;
+    background: transparent;
+    z-index: 3;
+}
+
+#danger_holder {
+    height: 200px;
+    top: 750px;
+    left: 35vw;
+}
+
+.center {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    margin-top: -50%;
+    margin-left: -50%;
+}
+
+.edit_nickname {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    margin-top: 10%;
+    margin-left: -50%;
+    padding: 8px;
+    font-size: 25px;
+    width: 70vw;
+    text-align: center;
+    background: var(--color12);
+    border: var(--color2) solid 2px;
+    color: var(--color2);
+}
+
+#add_game_button {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    margin-top: -50%;
+    margin-left: -50%;
+    top: 550px;
+    text-align: center;
+    background: var(--color12);
+    border: var(--color2) solid 3px;
+    color: var(--color2);
+    font-size: 20px;
+    width: 120px;
+    height: 40px;
+}
+
+#danger_edit {
+    margin-top: 0px;
+    width: 400px;
+    height: 200px;
+    border: 5px var(--color3) solid;
+    left: 12.5vw;
+}
+
+.danger_button {
+    position: relative;
+    text-align: center;
+    background: var(--color12);
+    border: var(--color3) solid 3px;
+    color: var(--color3);
+    font-size: 20px;
+    width: 200px;
+    height: 40px;
+    left: 25%;
+    margin-top: 40px;
+}
+
+.profile_pfp {
+    border-radius: 50%;
+    width: 300px;
+    height: 300px;
+    border: 5px solid var(--color2);
+    position: relative;
+    left: -50%;
+}
+
 .popup {
     position: fixed;
     width: 100%;

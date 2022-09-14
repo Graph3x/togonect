@@ -48,7 +48,7 @@ class ResetTokenButton extends Component {
     return (
     <div>
         {this.renderRedirect()}
-        <button onClick={this.togglePopup.bind(this)}>RESET TOKEN</button>
+        <button onClick={this.togglePopup.bind(this)} className='danger_button' >RESET TOKEN</button>
         {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO RESET YOUR ACCESS TOKEN, ARE YOU SURE?'
         cancelPopup={this.togglePopup.bind(this)} confirmPopup={this.confirm}/> : null}
     </div>

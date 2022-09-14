@@ -75,8 +75,8 @@ class EditPage extends Component {
   gameElement = (game) => {
     return(
         <Fragment key={game.id}>
-          <button onClick={() => this.removeGame(game.id)}>
-            <img className='gameX' src={game.cover}/>
+          <button onClick={() => this.removeGame(game.id)} className='edit_game_btn'>
+            <img className='gameX profile_game' src={game.cover}/>
           </button>
         </Fragment>
     )
@@ -91,21 +91,25 @@ class EditPage extends Component {
       <Fragment>
         <div id='edit'>
           {this.renderRedirect()}
-          <form>        
-            <input type="text" value={this.state.value} onChange={this.handleChange} placeholder={this.state.userdata.username}/>
-          </form>
-          <button onClick={this.handleSave}>SAVE</button>
-          <div>
-            {this.state.games.map(g => this.gameElement(g))}
-            <button onClick={this.togglePopup}>ADD GAME</button>
-            {this.state.showPopup ? <SelectGameAddPopup closePopup={this.togglePopup.bind(this)}/>: null}
+          <div className='center_holder'>
+            <form>        
+              <input type="text" value={this.state.value} onChange={this.handleChange} placeholder={this.state.userdata.username} className='edit_nickname'/>
+            </form>
+            <button onClick={this.handleSave} id='save_profile_button'>SAVE</button>
           </div>
+          <div id='games_div' className='center_holder'>
+            {this.state.games.map(g => this.gameElement(g))}
+          </div>
+          <div className='center_holder'>
+            <button onClick={this.togglePopup} id='add_game_button'>ADD GAME</button>
+          </div>
+          {this.state.showPopup ? <SelectGameAddPopup closePopup={this.togglePopup.bind(this)}/>: null}
         </div>
-        <div id='danger_edit'>
-          <br/>
-          <ResetTokenButton/>
-          <DeleteUserButton/>
-
+        <div id='danger_holder' className='center_holder'>
+          <div id='danger_edit' className='center'>
+            <ResetTokenButton/>
+            <DeleteUserButton/>
+          </div>
         </div>
       </Fragment>
   );
