@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import datetime, time
 from sqlalchemy.orm import Session
 import sqlalchemy
 import models
@@ -45,14 +45,14 @@ def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
 
 def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
     if not utils.validate_username(new_data.username):
-        return False
+        return 'username'
     try:
         user = db.query(models.User).filter(models.User.id == user_id).first()
         user.username = new_data.username
         db.commit()
         return True
     except Exception:
-        return False
+        return 'other'
 
 
 def change_token(db: Session, user: models.User, new_token: str):
@@ -175,14 +175,17 @@ def remove_user_game(db: Session, user: models.User, game: models.Game):
         return False
 
 
-def add_invite(db: Session, author: models.User, gameid: int, slots: int = None, time: time = None):
+def add_invite(db: Session, author: models.User, gameid: int, slots: int = None, itime: time = None):
     try:
         invite = models.Invite(
             game_id=gameid, author_id=author.id)
         if slots:
             invite.slots = slots
-        if time:
-            invite.time = time
+        if itime:
+            if itime > datetime.now():
+                invite.time = itime
+            else:
+                return 'time'
         invite.users.append(author)
         db.add(invite)
         db.commit()
@@ -191,7 +194,6 @@ def add_invite(db: Session, author: models.User, gameid: int, slots: int = None,
         return True
 
     except Exception as e:
-        print(e)
         return False
 
 

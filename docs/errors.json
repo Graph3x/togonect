@@ -1,0 +1,159 @@
+{
+    "errors": {
+        "400-0": {
+            "name": "Invalid Google Oauth Token",
+            "message": "Google authentication failed, please try again.",
+            "description": "Google oauth server did not accept the token supplied by user.",
+            "details": {}
+        },
+
+        "400-1": {
+            "name": "Google Email Not Verified",
+            "message": "You need to verify email in your google account.",
+            "description": "Users email is not verified by google.",
+            "details": {}
+        },
+
+        "401-2": {
+            "name": "Invalid Togo Token",
+            "message": "Your session is invalid. Please log-in again.",
+            "description": "Supplied Togo token is not valid. Can be caused by token expiration. User needs to request the correct token again by logging in with oauth.",
+            "details": {"frontend_behavior": "Should redirect to login page"}
+        },
+
+        "404-3": {
+            "name": "User By ID Not Found",
+            "message": "User not found, please verify you used correct ID",
+            "description": "Could not find a users with matching id. It could be invalid or the user might be deleted.",
+            "details": {"frontend_behavior": "Should show 404 page"}
+        },
+
+        "400-4": {
+            "name": "Invalid Username",
+            "message": "Username should be 2 to 31 characters without special characters.",
+            "description": "Invalid username, username should be longer than 1 and shorter than 32 characters.",
+            "details": {}
+        },
+
+        "500-5": {
+            "name": "Edit Failed",
+            "message": "Edit failed for unknown resons. Please try again later",
+            "description": "The edit user crud operation has failed for unknown resons.",
+            "details": {}
+        },
+
+        "400-6": {
+            "name": "Already Requested By You",
+            "message": "You have already sent request to this user.",
+            "description": "Friend requests cant be duplicate and this request would break that rule.",
+            "details": {}
+        },
+
+        "400-7": {
+            "name": "You Have Already Been Sent Request",
+            "message": "This user has already sent you a valid request",
+            "description": "Friend requests cant be duplicate and this request would break that rule.",
+            "details": {}
+        },
+
+        "400-8": {
+            "name": "Invalid Recipient",
+            "message": "You can not send request too this user.",
+            "description": "You can not send a request to yourself or to user that does not exist.",
+            "details": {}
+        },
+
+        "404-9": {
+            "name": "Request Not Found",
+            "message": "Friend request not found.",
+            "description": "Request with this ID does not seem to exist.",
+            "details": {}
+        },
+
+        "404-10": {
+            "name": "Friend Not Found",
+            "message": "You are not friends with this user.",
+            "description": "Friendship relation between you and requested user does not exist.",
+            "details": {}
+        },
+
+        "404-11": {
+            "name": "Game Not Found",
+            "message": "Game not found.",
+            "description": "game with this ID does not exist.",
+            "details": {}
+        },
+
+        "400-12": {
+            "name": "Input Did Not Pass Filter",
+            "message": "You used invalid characters (use letters, number and spaces).",
+            "description": "Input did not pass character filter.",
+            "details": {}
+        },
+
+        "400-13": {
+            "name": "Game Already Added",
+            "message": "Game already added.",
+            "description": "Game already added.",
+            "details": {}
+        },
+
+        "400-14": {
+            "name": "Game Not Added",
+            "message": "Game not added.",
+            "description": "You can not remove game that you have not added.",
+            "details": {}
+        },
+
+        "400-15": {
+            "name": "Time In Past",
+            "message": "Time has to be in the future.",
+            "description": "You can not create an event that takes place in the past.",
+            "details": {}
+        },
+
+        "500-16": {
+            "name": "General Invite Crud Error",
+            "message": "Creation failed, please try again later.",
+            "description": "Unknown crud error.",
+            "details": {}
+        },
+
+        "404-17": {
+            "name": "Invite Not Found",
+            "message": "Invite Not Found.",
+            "description": "Invite with this ID does not seem to exist.",
+            "details": {}
+        },
+
+        "400-18": {
+            "name": "Event Full",
+            "message": "This event is already full.",
+            "description": "This event has reached its capacity.",
+            "details": {}
+        },
+
+        "400-19": {
+            "name": "Already Accepted Different Invite",
+            "message": "You have already accepted a different invite.",
+            "description": "You can not accept multiple invites at the same time.",
+            "details": {}
+        },
+
+        "400-20": {
+            "name": "Author Cant Leave",
+            "message": "You are the author of this event",
+            "description": "Author of an event cant leave, they must cancel the whole event.",
+            "details": {}
+        },
+
+        "404-21": {
+            "name": "No Results",
+            "message": "No results.",
+            "description": "Search query response is empty.",
+            "details": {}
+        }
+
+        
+    }
+}

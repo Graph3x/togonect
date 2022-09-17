@@ -89,6 +89,7 @@ class EditPage extends Component {
   render() {
     return (
       <Fragment>
+        {this.state.showPopup ? <SelectGameAddPopup closePopup={this.togglePopup.bind(this)}/>: null}
         <div id='edit'>
           {this.renderRedirect()}
           <div className='center_holder'>
@@ -103,7 +104,6 @@ class EditPage extends Component {
           <div className='center_holder'>
             <button onClick={this.togglePopup} id='add_game_button'>ADD GAME</button>
           </div>
-          {this.state.showPopup ? <SelectGameAddPopup closePopup={this.togglePopup.bind(this)}/>: null}
         </div>
         <div id='danger_holder' className='center_holder'>
           <div id='danger_edit' className='center'>

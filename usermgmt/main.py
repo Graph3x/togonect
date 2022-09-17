@@ -51,9 +51,8 @@ app.add_middleware(
 #######################################################################################################################
 
 
-@app.get("/auth")
+@app.get("/auth/google")
 def authentication(token, db: Session = Depends(get_db)):
-
     try:
         user = id_token.verify_oauth2_token(token, requests.Request(
         ), "482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com")
@@ -69,10 +68,10 @@ def authentication(token, db: Session = Depends(get_db)):
                 return new_user.token
         else:
             raise HTTPException(
-                status_code=400, detail="Email Not Verified By Google")
+                status_code=400, detail="400-1")
 
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid Google Login")
+        raise HTTPException(status_code=400, detail="400-0")
 
 
 @app.get('/users/getid')
@@ -81,14 +80,14 @@ def get_user_id(token: str, db: Session = Depends(get_db)):
         dbuser = crud.get_user_by_email(db, token[:-256])
         return dbuser.id
     else:
-        raise HTTPException(status_code=400, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/users/{user_id}", response_model=schemas.User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="404-3")
     return db_user
 
 
@@ -96,37 +95,41 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 def edit_user(user_id: int, token: str, new_user: schemas.EditableUser, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="404-3")
     if utils.validate_token_user(token, db_user):
-        if crud.edit_user(db, user_id, new_user):
+        do_edit = crud.edit_user(db, user_id, new_user)
+        if do_edit == True:
             return Response('OK', status_code=202)
-        raise HTTPException(status_code=400, detail='User Update Failed')
-    raise HTTPException(status_code=403, detail="Forbidden")
+        if do_edit == 'username':
+            raise HTTPException(status_code=400, detail='400-4')
+        else:
+            raise HTTPException(status_code=400, detail='500-5')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, token: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="404-3")
     if utils.validate_token_user(token, db_user):
         if crud.delete_user(db, db_user=db_user):
             return Response('OK', status_code=200)
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/users/{user_id}/deletetoken")
 def delete_token(user_id: int, token: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="404-3")
     if utils.validate_token_user(token, db_user):
         new_token = utils.generate_token(
             db_user.email, settings.TOKEN_LEN)
         crud.change_token(db, db_user, new_token)
         return new_token
 
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/users/{users_id}/friends", response_model=list[schemas.Friend])
@@ -135,8 +138,8 @@ def get_friends(users_id: int, token: str, db: Session = Depends(get_db)):
     if usr:
         if token == usr.token:
             return usr.friends
-        raise HTTPException(status_code=403, detail="Forbidden")
-    raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=401, detail="401-2")
+    raise HTTPException(status_code=404, detail="404-3")
 
 
 @app.get("/users/{recipient_id}/request")
@@ -148,15 +151,13 @@ def send_frequest(recipient_id: int, token: str, db: Session = Depends(get_db)):
         if recpt and recpt != sender:
 
             if crud.get_frequest(db, sender.id, recipient_id):
-                raise HTTPException(
-                    status_code=400, detail="Already Requested By You")
+                raise HTTPException(status_code=401, detail="400-6")
             if crud.get_frequest(db, recipient_id, sender.id):
-                raise HTTPException(
-                    status_code=400, detail="Already Requested By Other")
+                raise HTTPException(status_code=401, detail="400-7")
             crud.add_frequest(db, sender.id, recipient_id)
             return True
-        raise HTTPException(status_code=400, detail="Invalid")
-    raise HTTPException(status_code=403, detail="Forbidden")
+        raise HTTPException(status_code=401, detail="400-8")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/frequests")
@@ -166,7 +167,7 @@ def get_frequests(token: str, db: Session = Depends(get_db)):
         frqs = crud.get_users_frequests(db, user.id)
         return frqs
 
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/frequests/{req_id}/accept")
@@ -181,9 +182,9 @@ def accept_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
             crud.add_friend(db, frq.recipient, frq.sender)
             return 'OK'
 
-        raise HTTPException(status_code=400, detail="Bad Request")
+        raise HTTPException(status_code=404, detail="404-9")
 
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/frequests/{req_id}/reject")
@@ -197,9 +198,9 @@ def reject_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
             db.commit()
             return 'OK'
 
-        raise HTTPException(status_code=400, detail="Bad Request")
+        raise HTTPException(status_code=404, detail="404-9")
 
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/frequests/{req_id}/cancel")
@@ -221,19 +222,19 @@ def remove_frequest(token: str, req_id: int, db: Session = Depends(get_db)):
             db.commit()
             return 'OK'
 
-        raise HTTPException(status_code=400, detail="Bad Request")
+        raise HTTPException(status_code=404, detail="404-9")
 
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/users/{user_id}/full", response_model=schemas.FullUser)
 def read_user(user_id: int, token: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="404-3")
     if token == db_user.token:
         return db_user
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/users/{user_id}/unfriend")
@@ -257,16 +258,20 @@ def remove_friend(token: str, user_id: int, db: Session = Depends(get_db)):
                 crud.remove_friend(db, user.id, user_id)
                 return "OK"
 
-        raise HTTPException(status_code=404, detail="Friend not found")
+        raise HTTPException(status_code=404, detail="404-10")
 
-    raise HTTPException(status_code=403, detail="Forbidden")
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/games/search', response_model=list[schemas.Game])
 def search_game(name: str):
-    games = utils.search_game(name)
-    gamesort = sorted(games, key=lambda d: d['id'])
-    return gamesort
+    if utils.validate_str(name):
+        games = utils.search_game(name)
+        gamesort = sorted(games, key=lambda d: d['id'])
+        if gamesort:
+            return gamesort
+        raise HTTPException(404, '404-11')
+    raise HTTPException(504, '400-12')
 
 
 @app.get('/games/{iden}', response_model=schemas.Game)
@@ -276,7 +281,7 @@ def get_game(iden: int, db: Session = Depends(get_db)):
         return in_db
     remote = utils.get_remote_game(iden)
     if remote == []:
-        raise HTTPException(404, 'Game not found')
+        raise HTTPException(404, '404-11')
     new_game = crud.add_game(db, remote[0])
     return new_game
 
@@ -287,17 +292,17 @@ def add_game(gid: int, token: str, db: Session = Depends(get_db)):
         user = crud.get_user_by_email(db, token[:-256])
         game = crud.get_game(db, gid)
         if game in user.games:
-            raise HTTPException(400, 'Game Already Added')
+            raise HTTPException(400, '400-13')
         if game:
             crud.add_user_game(db, user, game)
             return 'OK'
         remote = utils.get_remote_game(gid)
         if remote == []:
-            raise HTTPException(404, 'Game not found')
+            raise HTTPException(404, '404-11')
         new_game = crud.add_game(db, remote[0])
         crud.add_user_game(db, user, new_game)
         return 'OK'
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/games/{gid}/remove')
@@ -306,16 +311,16 @@ def remove_game(gid: int, token: str, db: Session = Depends(get_db)):
         user = crud.get_user_by_email(db, token[:-256])
         game = crud.get_game(db, gid)
         if game not in user.games:
-            raise HTTPException(400, 'Game Not Added')
+            raise HTTPException(400, '400-14')
         if game:
             crud.remove_user_game(db, user, game)
             return 'OK'
         remote = utils.get_remote_game(gid)
         if remote == []:
-            raise HTTPException(404, 'Game not found')
+            raise HTTPException(404, '404-11')
         crud.remove_user_game(db, user, game)
         return 'OK'
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.post('/invites/add')
@@ -324,15 +329,17 @@ def add_invite(token: str, invite_data: schemas.CreateInvite, db: Session = Depe
         user = crud.get_user_by_email(db, token[:-256])
         game = crud.get_game(db, invite_data.game_id)
         if game not in user.games:
-            raise HTTPException(400, 'Game Not Added')
+            raise HTTPException(400, '400-14')
         if game:
             invite = crud.add_invite(db, user, game.id,
                                      invite_data.slots, invite_data.time)
-            if invite:
+            if invite == True:
                 return 'OK'
-            raise HTTPException(400, 'Bad Request')
-        raise HTTPException(404, 'Game not found')
-    raise HTTPException(403, 'Forbidden')
+            elif invite == 'time':
+                raise HTTPException(400, '400-15')
+            raise HTTPException(500, '500-16')
+        raise HTTPException(404, '400-11')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/invites/{iden}/cancel')
@@ -341,12 +348,12 @@ def cancel_invite(token: str, iden: int, db: Session = Depends(get_db)):
         user = crud.get_user_by_email(db, token[:-256])
         invite = crud.get_invite(db, iden)
         if not invite:
-            raise HTTPException(404, 'Invite not found')
+            raise HTTPException(404, '404-17')
         if invite.author_id == user.id:
             crud.remove_invite(db, invite)
             return 'OK'
 
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/invites', response_model=list[schemas.Invite])
@@ -362,7 +369,7 @@ def get_invites(token: str, db: Session = Depends(get_db)):
                     invites.append(uf.invite)
 
         return invites
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/invites/{iden}', response_model=schemas.Invite)
@@ -371,10 +378,10 @@ def get_invite(token: str, iden: int, db: Session = Depends(get_db)):
         invite = db.query(models.Invite).filter(
             models.Invite.id == iden).first()
         if not invite:
-            raise HTTPException(404, 'Invite not found')
+            raise HTTPException(404, '404-17')
         return invite
 
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/invites/{iden}/join')
@@ -383,17 +390,17 @@ def join_event(token: str, iden: int, db: Session = Depends(get_db)):
         user = crud.get_user_by_email(db, token[:-256])
         invite = crud.get_invite(db, iden)
         if not invite:
-            raise HTTPException(404, 'Invite not found')
-        if invite.author_id == user.id:
-            raise HTTPException(400, 'You are the author')
+            raise HTTPException(404, '404-17')
+
         if invite.slots and invite.users:
             if len(invite.users) >= invite.slots:
-                raise HTTPException(400, 'Event is full')
+                raise HTTPException(400, '404-18')
         if user.invite == None:
             crud.join_event(db, user, invite)
             return 'OK'
+        raise HTTPException(400, '400-19')
 
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get('/invites/{iden}/leave')
@@ -402,14 +409,14 @@ def leave_event(token: str, iden: int, db: Session = Depends(get_db)):
         user = crud.get_user_by_email(db, token[:-256])
         invite = user.invite
         if not invite:
-            raise HTTPException(404, 'Invite not found')
+            raise HTTPException(404, '404-17')
         if invite.author_id == user.id:
-            raise HTTPException(400, 'You are the author')
+            raise HTTPException(400, '400-20')
         if user.invite != None:
             crud.leave_event(db, user)
             return 'OK'
 
-    raise HTTPException(403, 'Forbidden')
+    raise HTTPException(status_code=401, detail="401-2")
 
 
 # IN PROGRESS ##############TODO###########################################################
@@ -417,6 +424,10 @@ def leave_event(token: str, iden: int, db: Session = Depends(get_db)):
 @app.get('/search')
 def search(token: str, query: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
+
+        if not utils.validate_str(query):
+            raise HTTPException(504, '400-12')
+
         email_usrs = crud.get_full_user_by_email(db, query)
         name_usrs = crud.get_user_by_name(db, query)
         games = utils.search_game(query)
@@ -425,10 +436,12 @@ def search(token: str, query: str, db: Session = Depends(get_db)):
         result = [email_usrs]
         result.append(name_usrs)
         result.append(gamesort)
-        return result
+        if result:
+            return result
+        raise HTTPException(404, '404-21')
 
     else:
-        raise HTTPException(403, 'Forbidden')
+        raise HTTPException(status_code=401, detail="401-2")
 
 # DEVELOPMENT ONLY #########TODO###########################################################
 

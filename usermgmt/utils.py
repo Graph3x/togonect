@@ -6,6 +6,7 @@ from models import User
 import requests
 import json
 from config import settings
+import re
 
 
 def generate_token(iden, N):
@@ -35,7 +36,21 @@ def validate_username(username: str):
     if len(username) > 32:
         return False
 
-    return True
+    valid = re.match('^[ \w+]*$', username) is not None
+
+    return valid
+
+
+def validate_str(strng: str):
+    if len(strng) < 1:
+        return False
+
+    if len(strng) > 32:
+        return False
+
+    valid = re.match('^[ \w+]*$', strng) is not None
+
+    return valid
 
 
 def search_game(name: str):

@@ -1,5 +1,5 @@
 import {React, Component} from 'react';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider} from '@react-oauth/google';
 import { Navigate } from 'react-router-dom'
 import Gbutton from './gbutton';
 
@@ -12,7 +12,7 @@ class GoogleButton extends Component {
   }
 
   responseGoogle = (response) => {
-    fetch('http://localhost:8000/auth?token=' + response.credential)
+    fetch('http://localhost:8000/auth/google?token=' + response.credential)
     .then((response) => {return response.json();})
     .then((jsondata) => {localStorage.setItem('token', jsondata); this.setRedirect();})
   }
