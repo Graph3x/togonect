@@ -62,22 +62,24 @@ class Profile extends Component {
     }
     for(let i in this.state.frqs) {
       let frq = this.state.frqs[i]
+      if(frq.sender == this.state.id || frq.recipient == this.state.id) {
 
-      if(frq.status == 'accepted'){
-        return <UnFriendButton friend_id={this.state.id} id='edit_button'/>
-      }
-      if(frq.status == 'pending'){
-        if(frq.sender == this.state.userdata.id){
-          return <NavLink to={'/friends'} id='edit_button'>Accept/Reject</NavLink>
+        if(frq.status == 'accepted'){
+          return <UnFriendButton friend_id={this.state.id} id='edit_button'/>
         }
-        return <NavLink to={'/friends'} id='edit_button'>Invited</NavLink>
-      }
-      if(frq.status == 'rejected'){
-        if(frq.sender == this.state.userdata.id){
-          return <button onClick={() => {this.unblock(frq)}} id='edit_button'>Unblock</button>
+        if(frq.status == 'pending'){
+          if(frq.sender == this.state.userdata.id){
+            return <NavLink to={'/friends'} id='edit_button'>Accept/Reject</NavLink>
+          }
+          return <NavLink to={'/friends'} id='edit_button'>Invited</NavLink>
         }
+        if(frq.status == 'rejected'){
+          if(frq.sender == this.state.userdata.id){
+            return <button onClick={() => {this.unblock(frq)}} id='edit_button'>Unblock</button>
+          }
 
-        return <p id='edit_button'>Blocking You</p>
+          return <p id='edit_button'>Blocking You</p>
+        }
       }
     }
     return <AddFriendButton friend_id={this.state.id} id='edit_button'/>

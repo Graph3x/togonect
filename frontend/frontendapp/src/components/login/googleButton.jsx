@@ -1,11 +1,16 @@
 import {React, Component} from 'react';
-import { GoogleOAuthProvider} from '@react-oauth/google';
-import { Navigate } from 'react-router-dom'
-import Gbutton from './gbutton';
+import { GoogleOAuthProvider, GoogleLogin} from '@react-oauth/google';
+import { Navigate} from 'react-router-dom'
+
+
 
 
 class GoogleButton extends Component {
-  state = {redirect: false, togoid: 0}
+  state = {
+    redirect: false,
+    togoid: 0,
+  }
+  
 
   setRedirect = () => {
     this.setState({redirect: true})
@@ -32,14 +37,12 @@ class GoogleButton extends Component {
     }
   }
 
-  testfunc = (testin) => {console.log(testin)}
-
   render() {
     return (
       <div>
         {this.renderRedirect()}
         <GoogleOAuthProvider clientId="482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com">
-          <Gbutton func={this.responseGoogle}/>
+          <GoogleLogin onSuccess={tokenResponse => {this.responseGoogle(tokenResponse)}} theme='filled_blue' shape='pill'></GoogleLogin>
         </GoogleOAuthProvider>
       </div>
   );
@@ -47,8 +50,5 @@ class GoogleButton extends Component {
 }
 
 export default GoogleButton;
-
-
-
 
 

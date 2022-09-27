@@ -1,8 +1,8 @@
 import {React, Component} from 'react';
 import {Navigate} from 'react-router-dom';
-import ConfirmPopup from './popup';
+import ConfirmPopup from '../common/popup';
 
-class DeleteUserButton extends Component {
+class ResetTokenButton extends Component {
     constructor(props){  
       super(props);  
       this.state = { showPopup: false };  
@@ -12,10 +12,11 @@ class DeleteUserButton extends Component {
     redirect: false
   }
 
-  deleteUser = () => {
+  resetToken = () => {
     let token = localStorage.getItem('token');
     let togo_id = localStorage.getItem('togo_id');
-    fetch('http://localhost:8000/users/' + togo_id + '?token=' + token, {method: 'DELETE'});
+    fetch('http://localhost:8000/users/' + togo_id + '/deletetoken?token=' + token);
+    localStorage.removeItem('token');
     this.setRedirect();
 }
 
@@ -39,7 +40,7 @@ class DeleteUserButton extends Component {
 
   confirm = () => {
     this.setState({showPopup: !this.state.showPopup});
-    this.deleteUser();
+    this.resetToken();
   }
 
 
@@ -47,12 +48,12 @@ class DeleteUserButton extends Component {
     return (
     <div>
         {this.renderRedirect()}
-        <button onClick={this.togglePopup.bind(this)} className='danger_button'>DELETE ACCOUNT</button>
-        {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO DELETE YOUR ACCOUNT, ARE YOU SURE?'
+        <button onClick={this.togglePopup.bind(this)} className='danger_button' >RESET TOKEN</button>
+        {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO RESET YOUR ACCESS TOKEN, ARE YOU SURE?'
         cancelPopup={this.togglePopup.bind(this)} confirmPopup={this.confirm}/> : null}
     </div>
   );
   }
 }
 
-export default DeleteUserButton;
+export default ResetTokenButton;

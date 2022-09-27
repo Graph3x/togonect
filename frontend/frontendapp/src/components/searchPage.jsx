@@ -54,6 +54,7 @@ class SearchPage extends React.Component {
                 {this.renderUsersEmail()}
                 {this.renderUsersName()}
                 {this.renderGames()}
+
             </div>  
         );  
     }  

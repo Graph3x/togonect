@@ -1,7 +1,7 @@
 import React from "react";
 import {Outlet, useLocation} from "react-router-dom";
 import Navbar from "./navbar";
-import '../styles.css';
+import '../../styles.css';
 
 const Layout = () => {
 
@@ -9,7 +9,7 @@ const Layout = () => {
 
   return (
     <>
-      {location.pathname == '/' ? null : <Navbar/>}
+      {location.pathname === '/' ? null : <Navbar/>}
       <Outlet/>
     </>
   );

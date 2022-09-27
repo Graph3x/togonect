@@ -151,6 +151,8 @@ def send_frequest(recipient_id: int, token: str, db: Session = Depends(get_db)):
         if recpt and recpt != sender:
 
             if crud.get_frequest(db, sender.id, recipient_id):
+                print(sender.id)
+                print(recipient_id)
                 raise HTTPException(status_code=401, detail="400-6")
             if crud.get_frequest(db, recipient_id, sender.id):
                 raise HTTPException(status_code=401, detail="400-7")
@@ -458,11 +460,3 @@ def check(token: str, db: Session = Depends(get_db)):
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
-
-
-@app.get("/addfriend")
-def add_friend(user_id: int, friend_id: int, db: Session = Depends(get_db)):
-    #crud.add_friend(db, user_id, friend_id)
-    usr = db.query(models.User).filter(models.User.id == user_id).first()
-    for friend in usr.friends:
-        print(friend.friend_id)

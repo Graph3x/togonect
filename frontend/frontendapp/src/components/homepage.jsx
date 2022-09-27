@@ -1,5 +1,5 @@
 import React, { Component } from 'react';  
-import InviteCard from './inviteCard';
+import InviteCard from './invites/inviteCard';
 import { NavLink } from 'react-router-dom';
 
 class Homepage extends Component {
@@ -42,6 +42,17 @@ class Homepage extends Component {
     }
   }
 
+  renderInvites = (inv) => {
+    if (this.state.userdata.invite == null) {
+      return <InviteCard invite={inv} udata={this.state.userdata} key={inv.id}/>
+    }
+
+    if(this.state.userdata.invite.id !== inv.id){
+        return <InviteCard invite={inv} udata={this.state.userdata} key={inv.id}/>
+    }
+
+  }
+
 
     render() {  
         return (  
@@ -49,7 +60,7 @@ class Homepage extends Component {
                 {this.renderAddInv()}
                 <div id='invites_div'>
                   {this.renderInvite()}
-                  {this.state.invites.map(i => <InviteCard invite={i} udata={this.state.userdata} key={i.id}/>)}
+                  {this.state.invites.map(i => this.renderInvites(i))}
                 </div>
                 
             </div>

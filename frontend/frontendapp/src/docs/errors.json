@@ -18,14 +18,14 @@
             "name": "Invalid Togo Token",
             "message": "Your session is invalid. Please log-in again.",
             "description": "Supplied Togo token is not valid. Can be caused by token expiration. User needs to request the correct token again by logging in with oauth.",
-            "details": {"frontend_behavior": "Should redirect to login page"}
+            "details": {"redirect": "/"}
         },
 
         "404-3": {
             "name": "User By ID Not Found",
             "message": "User not found, please verify you used correct ID",
             "description": "Could not find a users with matching id. It could be invalid or the user might be deleted.",
-            "details": {"frontend_behavior": "Should show 404 page"}
+            "details": {"redirect": "/404"}
         },
 
         "400-4": {

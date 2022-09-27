@@ -2,16 +2,16 @@ import {React} from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 
-import Layout from './components/Layout';
-import LoginPage from './components/loginPage';
-import Profile from './components/profile';
-import EditPage from './components/editPage';
+import Layout from './components/common/Layout';
+import LoginPage from './components/login/loginPage';
+import Profile from './components/profile/profile';
+import EditPage from './components/edit_profile/editPage';
 import Homepage from './components/homepage';
-import FriendsPage from './components/friendsPage';
+import FriendsPage from './components/friends/friendsPage';
 import GamePage from './components/gamePage';
-import AddInvPage from './components/addInvPage';
+import AddInvPage from './components/invites/addInvPage';
 import SearchPage from './components/searchPage';
-import EventPage from './components/eventPage';
+import EventPage from './components/invites/eventPage';
 
 
 const container = document.getElementById('root');

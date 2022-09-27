@@ -2,8 +2,7 @@ import {React, Component, Fragment} from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import DeleteUserButton from './deleteUserButton';
 import ResetTokenButton from './resetTokenButton';
-import '../styles.css'
-import {SelectGameAddPopup} from './popup';
+import {SelectGameAddPopup} from '../common/popup';
 
 
 function withParams(Component) {

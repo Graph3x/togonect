@@ -112,7 +112,7 @@ def add_frequest(db: Session, sender_id: int, recipient_id: int):
 
 
 def get_frequest(db: Session, sender_id: int, recipient_id: int):
-    return db.query(models.Frequest).filter(models.Frequest.sender == sender_id and models.Frequest.recipient == recipient_id).first()
+    return db.query(models.Frequest).filter(models.Frequest.sender == sender_id, models.Frequest.recipient == recipient_id).first()
 
 
 def get_users_frequests(db: Session, user_id: int):
