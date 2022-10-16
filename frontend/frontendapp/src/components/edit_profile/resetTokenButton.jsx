@@ -1,6 +1,8 @@
 import {React, Component} from 'react';
 import {Navigate} from 'react-router-dom';
 import ConfirmPopup from '../common/popup';
+import handleError from '../common/handleError';
+
 
 class ResetTokenButton extends Component {
     constructor(props){  
@@ -9,16 +11,41 @@ class ResetTokenButton extends Component {
     }
 
   state = {
-    redirect: false
+    redirect: false,
+    navigator: false,
+  }
+
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
   }
 
   resetToken = () => {
     let token = localStorage.getItem('token');
     let togo_id = localStorage.getItem('togo_id');
-    fetch('http://localhost:8000/users/' + togo_id + '/deletetoken?token=' + token);
-    localStorage.removeItem('token');
-    this.setRedirect();
-}
+    fetch('http://localhost:8000/users/' + togo_id + '/deletetoken?token=' + token)
+    .then((response) => {return response.json()})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        localStorage.removeItem('token');
+        this.setRedirect();
+      }
+    }
+    )
+  }
 
   setRedirect = () => {
     this.setState({redirect: true})
@@ -47,6 +74,7 @@ class ResetTokenButton extends Component {
   render() {
     return (
     <div>
+      {this.renderNavigator()}
         {this.renderRedirect()}
         <button onClick={this.togglePopup.bind(this)} className='danger_button' >RESET TOKEN</button>
         {this.state.showPopup ? <ConfirmPopup text='WARNING: YOU ARE ABOUT TO RESET YOUR ACCESS TOKEN, ARE YOU SURE?'

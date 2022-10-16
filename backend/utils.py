@@ -7,6 +7,8 @@ import requests
 import json
 from config import settings
 import re
+import logging
+log = logging.getLogger("main_logger")
 
 
 def generate_token(iden, N):
@@ -18,14 +20,16 @@ def validate_token(db: Session, token: str):
         email = token[:-256]
         user = crud.get_user_by_email(db, email=email)
         return token == user.token
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
 def validate_token_user(token: str, user: User):
     try:
         return token == user.token
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -102,4 +106,5 @@ def get_remote_cover(iden: int):
         return f'https://images.igdb.com/igdb/image/upload/t_cover_big/{img_id}.png'
 
     except Exception as e:
+        log.error(e)
         return []

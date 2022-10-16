@@ -1,9 +1,10 @@
 import {React, Component, Fragment} from 'react';
 import { useParams } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
 import OptionsMenu from './optionsMenu';
 import AddFriendButton from './addFriendButton';
 import UnFriendButton from './unFriendButton';
+import handleError from '../common/handleError';
 
 
 function withParams(Component) {
@@ -19,6 +20,7 @@ class Profile extends Component {
         render_options: false,
         frqs: [],
         games: [],
+        navigator: false,
     }
 
   componentDidMount() {
@@ -31,15 +33,37 @@ class Profile extends Component {
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString())
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({userdata:jsondata}); return jsondata})
-    .then((jsondata) => {this.setState({games:jsondata.games})})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({userdata:jsondata});
+        this.setState({games:jsondata.games});
+      }
+    }
+    )
   }
 
 
   getFrqs = () => {
     fetch('http://localhost:8000/frequests?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({frqs:jsondata})})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({frqs:jsondata});
+      }
+    }
+    )
   }
 
   options = () => {
@@ -51,7 +75,18 @@ class Profile extends Component {
   unblock = (frq) => {
     fetch('http://localhost:8000/frequests/' + frq.id + '/cancel?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((r) => {window.location.reload();})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
 
@@ -106,9 +141,23 @@ class Profile extends Component {
   }
 
 
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
+  }
+
+
   render() {
     return (
         <div id='profile' className='root_div'>
+            {this.renderNavigator()}
             <button onClick={this.options} className='general_button'>OPTIONS</button>
             {this.renderOptions()}
             {this.renderButton()}

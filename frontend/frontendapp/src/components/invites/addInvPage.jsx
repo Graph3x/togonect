@@ -1,5 +1,6 @@
 import {React, Component} from 'react';
 import { Navigate } from 'react-router-dom';
+import handleError from '../common/handleError';
 
 
 class AddInvPage extends Component {
@@ -14,6 +15,7 @@ class AddInvPage extends Component {
         time: '',
         userdata: '',
         games: [],
+        navigator: false,
     }
 
 
@@ -28,8 +30,19 @@ class AddInvPage extends Component {
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden + '/full?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({userdata:jsondata}); return jsondata})
-    .then((jsondata) => {this.setState({games:jsondata.games})})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({userdata:jsondata});
+        this.setState({games:jsondata.games});
+      }
+    }
+    )
   }
 
 
@@ -62,7 +75,32 @@ class AddInvPage extends Component {
       }
       let path = 'http://localhost:8000/invites/add?token=' + localStorage.getItem('token'); 
     fetch(path, requestOptions)
-    this.setRedirect();
+    .then((response) => {return response.json()})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setRedirect();
+      }
+    }
+    )
+    
+  }
+
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
   }
 
 
@@ -110,6 +148,7 @@ class AddInvPage extends Component {
     if(this.state.stage == 0) {
         return (
             <div id='game'>
+              {this.renderNavigator()}
               <h2 className='title'>SELECT GAME</h2>
                 {this.state.games.map(g => this.gameElement(g))}
             </div>
@@ -120,6 +159,7 @@ class AddInvPage extends Component {
 
         return (
             <div id='slots'>
+              {this.renderNavigator()}
               <h2 className='title'>SELECT NUMBER OF PLAYERS</h2>
               {this.slotsSelector()}
               {this.unlimitedButton()}
@@ -133,6 +173,7 @@ class AddInvPage extends Component {
         return (
             <div id='time'>
               {this.renderRedirect()}
+              {this.renderNavigator()}
               <h2>Pick time or no time</h2>
               <input type="datetime-local" value={this.state.value} onChange={(e) => this.handleChange(e)}
               id="time_selector"
@@ -144,6 +185,7 @@ class AddInvPage extends Component {
 
     return (
         <div id='edit'>
+          {this.renderNavigator()}
           <p>Unknown error</p>
         </div>
 

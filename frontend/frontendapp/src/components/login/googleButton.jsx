@@ -1,16 +1,17 @@
 import {React, Component} from 'react';
-import { GoogleOAuthProvider, GoogleLogin} from '@react-oauth/google';
-import { Navigate} from 'react-router-dom'
+import {GoogleOAuthProvider, GoogleLogin} from '@react-oauth/google';
+import {Navigate} from 'react-router-dom'
 
-
+import handleError from '../common/handleError';
 
 
 class GoogleButton extends Component {
   state = {
     redirect: false,
     togoid: 0,
+    navigator: false,
   }
-  
+
 
   setRedirect = () => {
     this.setState({redirect: true})
@@ -19,7 +20,19 @@ class GoogleButton extends Component {
   responseGoogle = (response) => {
     fetch('http://localhost:8000/auth/google?token=' + response.credential)
     .then((response) => {return response.json();})
-    .then((jsondata) => {localStorage.setItem('token', jsondata); this.setRedirect();})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        localStorage.setItem('token', jsondata);
+        this.setRedirect();
+      }
+    }
+    )
   }
 
   renderRedirect = () => {
@@ -28,11 +41,33 @@ class GoogleButton extends Component {
       const token = localStorage.getItem('token');
       fetch('http://localhost:8000/users/getid?token=' + token)
       .then((response) => {return response.json();})
-      .then((jsondata) => {localStorage.setItem('togo_id', jsondata); return jsondata})
-      .then((jsondata) => {this.setState({togoid: jsondata})});
+      .then((jsondata) => {
+        if(Object.keys(jsondata).includes('detail')){
+          let redirectAddress = handleError(jsondata['detail'])
+          if(redirectAddress){
+            this.setState({navigator: redirectAddress})
+          }
+        }
+      else{
+        localStorage.setItem('togo_id', jsondata);
+        this.setState({togoid: jsondata}); 
+      }
+     }
+    )
+    }
+  if(localStorage.getItem('togo_id')){
+    return(<Navigate to={'/profile/' + localStorage.getItem('togo_id') + '/edit'}/>)
+  } 
+  }
 
-      if (this.state.togoid != 0) {
-        return(<Navigate to={'/profile/' + this.state.togoid + '/edit'}/>)
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
       }
     }
   }
@@ -41,6 +76,7 @@ class GoogleButton extends Component {
     return (
       <div>
         {this.renderRedirect()}
+        {this.renderNavigator()}
         <GoogleOAuthProvider clientId="482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com">
           <GoogleLogin onSuccess={tokenResponse => {this.responseGoogle(tokenResponse)}} theme='filled_blue' shape='pill'></GoogleLogin>
         </GoogleOAuthProvider>
@@ -50,5 +86,3 @@ class GoogleButton extends Component {
 }
 
 export default GoogleButton;
-
-

@@ -152,8 +152,13 @@
             "message": "No results.",
             "description": "Search query response is empty.",
             "details": {}
+        },
+        "401-22": {
+            "name": "Invalid Event/Invite",
+            "message": "Event not found",
+            "description": "You do not have permission to access this event/invite.",
+            "details": {"redirect": "/404"}
         }
-
         
     }
 }

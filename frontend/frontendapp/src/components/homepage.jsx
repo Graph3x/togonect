@@ -1,6 +1,7 @@
 import React, { Component } from 'react';  
 import InviteCard from './invites/inviteCard';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
+import handleError from './common/handleError'
 
 class Homepage extends Component {
 
@@ -8,6 +9,7 @@ class Homepage extends Component {
     state = {
         invites : [],
         userdata: [],
+        navigator: false,
 
     }
 
@@ -19,13 +21,35 @@ class Homepage extends Component {
   getInvites = () => {
     fetch('http://localhost:8000/invites?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({invites:jsondata}); return jsondata})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({invites:jsondata});
+      }
+    }
+    )
   }
 
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden + '/full?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({userdata:jsondata}); return jsondata})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({userdata:jsondata});
+      }
+    }
+    )
   }
 
 
@@ -53,6 +77,18 @@ class Homepage extends Component {
 
   }
 
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
+  }
+
 
     render() {  
         return (  
@@ -61,6 +97,7 @@ class Homepage extends Component {
                 <div id='invites_div'>
                   {this.renderInvite()}
                   {this.state.invites.map(i => this.renderInvites(i))}
+                  {this.renderNavigator()}
                 </div>
                 
             </div>

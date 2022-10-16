@@ -3,7 +3,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import DeleteUserButton from './deleteUserButton';
 import ResetTokenButton from './resetTokenButton';
 import {SelectGameAddPopup} from '../common/popup';
-
+import handleError from '../common/handleError';
 
 function withParams(Component) {
     return props => <Component {...props} params={useParams()}/>;
@@ -19,7 +19,20 @@ class EditPage extends Component {
         redirect: false,
         games: [],
         showPopup: false,
+        navigator: null,
     }
+
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
+  }
 
   componentDidMount() {
     let { iden } = this.props.params;
@@ -31,6 +44,18 @@ class EditPage extends Component {
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString())
     .then((response) => {return response.json();})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        return(jsondata)
+      }
+    }
+    )
     .then((jsondata) => {this.setState({userdata:jsondata}); return jsondata})
     .then((jsondata) => {this.setState({games:jsondata.games})})
   }
@@ -55,20 +80,44 @@ class EditPage extends Component {
     if(this.state.value) {
       const requestOptions = {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ username: this.state.value })
       }
       let path = 'http://localhost:8000/users/' + this.state.id + '/edit?token=' + localStorage.getItem('token'); 
       fetch(path, requestOptions)
+      .then((response) => {return response.json()})
+      .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setRedirect();
+      }
     }
-    this.setRedirect();
+    )
+    }
+    
   }
 
   removeGame = (gid) => {
     let path = 'http://localhost:8000/games/' + gid + '/remove?token=' + localStorage.getItem('token');
     fetch(path)
-    .then((response) => {return response.json();})
-    .then((jsondata) => {window.location.reload();})
+    .then((response) => {return response.json()})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
   gameElement = (game) => {
@@ -88,6 +137,7 @@ class EditPage extends Component {
   render() {
     return (
       <Fragment>
+        {this.renderNavigator()}
         {this.state.showPopup ? <SelectGameAddPopup closePopup={this.togglePopup.bind(this)}/>: null}
         <div id='edit'>
           {this.renderRedirect()}

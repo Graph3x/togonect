@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException
 from config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -91,7 +91,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.put("/users/{user_id}/edit", response_model=schemas.EditableUser)
+@app.put("/users/{user_id}/edit")
 def edit_user(user_id: int, token: str, new_user: schemas.EditableUser, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
@@ -99,7 +99,7 @@ def edit_user(user_id: int, token: str, new_user: schemas.EditableUser, db: Sess
     if utils.validate_token_user(token, db_user):
         do_edit = crud.edit_user(db, user_id, new_user)
         if do_edit == True:
-            return Response('OK', status_code=202)
+            return 'OK'
         if do_edit == 'username':
             raise HTTPException(status_code=400, detail='400-4')
         else:
@@ -114,7 +114,7 @@ def delete_user(user_id: int, token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="404-3")
     if utils.validate_token_user(token, db_user):
         if crud.delete_user(db, db_user=db_user):
-            return Response('OK', status_code=200)
+            return 'OK'
     raise HTTPException(status_code=401, detail="401-2")
 
 
@@ -362,14 +362,7 @@ def cancel_invite(token: str, iden: int, db: Session = Depends(get_db)):
 def get_invites(token: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
         user = crud.get_user_by_email(db, token[:-256])
-        invites = []
-        for friend in user.friends:
-            uf = crud.get_user(db, friend.friend_id)
-            if uf.invite:
-                game = crud.get_game(db, uf.invite.game_id)
-                if game in user.games:
-                    invites.append(uf.invite)
-
+        invites = crud.get_invites(db, user)
         return invites
     raise HTTPException(status_code=401, detail="401-2")
 
@@ -381,6 +374,8 @@ def get_invite(token: str, iden: int, db: Session = Depends(get_db)):
             models.Invite.id == iden).first()
         if not invite:
             raise HTTPException(404, '404-17')
+        if invite not in crud.get_invites(db, crud.get_user_by_email(db, token[:-256])):
+            raise HTTPException(401, detail='401-22')
         return invite
 
     raise HTTPException(status_code=401, detail="401-2")
@@ -398,8 +393,10 @@ def join_event(token: str, iden: int, db: Session = Depends(get_db)):
             if len(invite.users) >= invite.slots:
                 raise HTTPException(400, '404-18')
         if user.invite == None:
-            crud.join_event(db, user, invite)
-            return 'OK'
+            if invite in crud.get_invites(db, user):
+                crud.join_event(db, user, invite)
+                return 'OK'
+            raise HTTPException(400, '401-22')
         raise HTTPException(400, '400-19')
 
     raise HTTPException(status_code=401, detail="401-2")
@@ -451,9 +448,9 @@ def search(token: str, query: str, db: Session = Depends(get_db)):
 @app.get('/')
 def check(token: str, db: Session = Depends(get_db)):
     if utils.validate_token(db, token):
-        return 'allowed'
+        return 'OK'
     else:
-        return 'Denied'
+        raise HTTPException(status_code=401, detail="401-2")
 
 
 @app.get("/users/", response_model=list[schemas.FullUser])

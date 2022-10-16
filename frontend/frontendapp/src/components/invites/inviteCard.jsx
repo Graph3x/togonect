@@ -1,5 +1,6 @@
 import {React, Component, Fragment} from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
+import handleError from '../common/handleError';
 
 
 class InviteCard extends Component {
@@ -12,6 +13,7 @@ class InviteCard extends Component {
         author: '',
         game: '',
         freeSlots: 0,
+        navigator: false,
   }
 
   componentDidMount() {
@@ -32,7 +34,18 @@ class InviteCard extends Component {
   getGame = () =>{
         fetch('http://localhost:8000/games/' + this.props.invite.game_id)
         .then((response) => {return response.json();})
-        .then((jsondata) => {this.setState({game: jsondata});})
+        .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({game: jsondata});
+      }
+    }
+    )
   }
 
   gameElement = (game) => {
@@ -49,20 +62,53 @@ class InviteCard extends Component {
   join = () => {
     fetch('http://localhost:8000/invites/' + this.props.invite.id + '/join?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((response) => {window.location.reload();}) 
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
   leave = () => {
     fetch('http://localhost:8000/invites/0/leave?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((response) => {window.location.reload();}) 
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
 
   cancel = () => {
     fetch('http://localhost:8000/invites/' + this.props.invite.id + '/cancel?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((response) => {window.location.reload();}) 
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
 
@@ -107,6 +153,18 @@ class InviteCard extends Component {
     return <h3 className='invite_slots'>{this.state.freeSlots}/{this.props.invite.slots}</h3>
   }
 
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
+  }
+
 
   render() {
     return (
@@ -116,6 +174,7 @@ class InviteCard extends Component {
         {this.renderSlots()}
         {this.getTime()}
         {this.renderButton()}
+        {this.renderNavigator()}
     </div>
   );
   }

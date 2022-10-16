@@ -1,29 +1,46 @@
 import {React, Component} from 'react';
 import { Navigate } from 'react-router-dom';
 import GoogleButton from './googleButton';
-
+import handleError from '../common/handleError';
 
 class LoginBlock extends Component {
 
   state = {
-    redirect: false
+    redirect: false,
   }
 
-
   renderRedirect = () => {
-    if (localStorage.getItem('token'))
+    if (localStorage.getItem('token') != null)
     {
-      return(<Navigate to='/homepage'/>);
+      fetch('http://localhost:8000/?token=' + localStorage.getItem('token'))
+      .then((response) => {return response.json()})
+      .then((jsondata) => {
+        if(Object.keys(jsondata).includes('detail')){
+          console.log('PRECO')
+          localStorage.removeItem('togo_id');
+          localStorage.removeItem('token');
+          window.location.reload();
+          
+        }
+        else{
+          this.setState({redirect: true})
+        }
+      }
+      )
     }
+    else {
+      return <GoogleButton/>
+    }
+
   }
 
 
   render() {
     return (
-        <div>
-            {this.renderRedirect()}
-            <GoogleButton/>
-        </div>
+      <div>
+        {this.renderRedirect()}
+        {this.state.redirect? <Navigate to={'/homepage'}/> : null}
+      </div>
   );
   }
 }

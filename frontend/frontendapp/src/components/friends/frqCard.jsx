@@ -1,6 +1,7 @@
 import {React, Component} from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate} from 'react-router-dom';
 import FrqButton from './FrqButton';
+import handleError from '../common/handleError';
 
 
 class FrqCard extends Component {
@@ -8,7 +9,8 @@ class FrqCard extends Component {
     state = {
         other_id: 0,
         is_recipient: false,
-        userdata: []
+        userdata: [],
+        navigator: false,
     }
 
     componentDidMount() {
@@ -20,7 +22,18 @@ class FrqCard extends Component {
     getProfile = (oid) => {
         fetch('http://localhost:8000/users/' + oid.toString())
         .then((response) => {return response.json();})
-        .then((jsondata) => {this.setState({userdata:jsondata})})
+        .then((jsondata) => {
+        if(Object.keys(jsondata).includes('detail')){
+            let redirectAddress = handleError(jsondata['detail'])
+            if(redirectAddress){
+            this.setState({navigator: redirectAddress})
+            }
+        }
+        else{
+            this.setState({userdata:jsondata});
+        }
+        }
+        )
     }
 
 
@@ -36,6 +49,18 @@ class FrqCard extends Component {
         }
         
     }
+
+    renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
+  }
 
 
     renderFrqCard = () => {
@@ -65,6 +90,7 @@ class FrqCard extends Component {
             <img src={this.state.userdata.profile_picture} alt='Profile picture' height={100} width={100} referrerPolicy="no-referrer"/>
         </NavLink>
         {this.renderFrqCard()}
+        {this.renderNavigator()}
     </div>
   );
   }

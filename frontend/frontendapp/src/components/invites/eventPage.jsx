@@ -1,6 +1,7 @@
 import {React, Component} from 'react';
 import { useParams } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
+import handleError from '../common/handleError';
 
 
 function withParams(Component) {
@@ -15,6 +16,7 @@ class EventPage extends Component {
     game: {},
     author: '',
     freeSlots: -1,
+    navigator: false,
   }
 
   componentDidMount(){
@@ -25,20 +27,53 @@ class EventPage extends Component {
   getEvent = (eventId) =>{
   fetch('http://localhost:8000/invites/' + eventId + '?token=' + localStorage.getItem('token'))
   .then((response) => {return response.json();})
-  .then((jsondata) => {this.setState({event: jsondata}); return jsondata;})
-  .then((jsondata) => {this.getGame(jsondata.game_id)})
+  .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({event: jsondata})
+        this.getGame(jsondata.game_id)
+      }
+    }
+    )
 }
 
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString())
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({udata:jsondata})})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({udata:jsondata});
+      }
+    }
+    )
   }
 
   getGame = (gameId) =>{
     fetch('http://localhost:8000/games/' + gameId)
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({game: jsondata});})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({game: jsondata});
+      }
+    }
+    )
 }
 
   userPic = (userdata) => {
@@ -59,20 +94,53 @@ class EventPage extends Component {
   join = () => {
     fetch('http://localhost:8000/invites/' + this.state.event.id + '/join?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((response) => {window.location.reload();}) 
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
   leave = () => {
     fetch('http://localhost:8000/invites/0/leave?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((response) => {window.location.reload();}) 
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
 
   cancel = () => {
     fetch('http://localhost:8000/invites/' + this.state.event.id + '/cancel?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((response) => {window.location.reload();}) 
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
 
@@ -94,6 +162,18 @@ class EventPage extends Component {
     
   }
 
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
+  }
+
   render() {
     return (
       <div>
@@ -102,6 +182,7 @@ class EventPage extends Component {
         <h1>Attending:</h1>
         {this.rednerUsers()}
         {this.renderButton()}
+        {this.renderNavigator()}
       </div>
   );
   }

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import FriendCard from './friendCard';
 import FrqCard from './frqCard';
+import handleError from '../common/handleError';
+import { Navigate } from 'react-router-dom';
 
 
 class FriendsPage extends Component {
@@ -10,6 +12,7 @@ class FriendsPage extends Component {
         id : 'None',
         frqs: [],
         valid_frqs: [],
+        navigator: false,
     }
 
   componentDidMount() {
@@ -21,15 +24,50 @@ class FriendsPage extends Component {
   getFriends = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString() + '/friends?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({friends:jsondata})})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({friends:jsondata})
+      }
+    }
+    )
   }
 
   getFrqs = () => {
     fetch('http://localhost:8000/frequests?token=' + localStorage.getItem('token'))
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({frqs: jsondata}); return jsondata})
-    .then((jsondata) => {this.getValidFrqs(jsondata)})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({frqs: jsondata});
+        this.getValidFrqs(jsondata);
+
+      }
+    }
+    )
     
+  }
+
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
   }
 
 
@@ -50,6 +88,7 @@ class FriendsPage extends Component {
                 <h1> FRIENDS </h1> 
                 {this.state.friends.map(f => <FriendCard iden={f.friend_id} key={f.friend_id}/>)}
                 {this.state.valid_frqs.map(f => <FrqCard frq={f} user={this.state.id} key={f.id}/>)}
+                {this.renderNavigator()}
             </div>
         );  
     }  

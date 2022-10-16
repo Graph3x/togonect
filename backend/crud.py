@@ -1,9 +1,10 @@
 from datetime import datetime, time
 from sqlalchemy.orm import Session
-import sqlalchemy
 import models
 import schemas
 import utils
+import logging
+log = logging.getLogger("main_logger")
 
 
 def get_user(db: Session, user_id: int):
@@ -39,7 +40,8 @@ def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
         user.username = new_data.username
         db.commit()
         return True
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -51,7 +53,8 @@ def edit_user(db: Session, user_id: int, new_data: schemas.EditableUser):
         user.username = new_data.username
         db.commit()
         return True
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return 'other'
 
 
@@ -61,7 +64,8 @@ def change_token(db: Session, user: models.User, new_token: str):
         user.token_expiration = 30
         db.commit()
         return True
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -74,6 +78,7 @@ def add_friend(db: Session, user_id: int, friend_id: int):
         db.commit()
         return True
     except Exception as e:
+        log.error(e)
         return False
 
 
@@ -85,16 +90,12 @@ def remove_friend(db: Session, user_id: int, friend_id: int):
         friend2 = db.query(models.Friend).filter(
             models.Friend.user_id == friend_id, models.Friend.friend_id == user_id).first()
 
-        #user1 = db.query(models.User).filter(models.User.id == user_id).first()
-        #user2 = db.query(models.User).filter(models.User.id == friend_id).first()
-
-        # user.friends.append(friend)
-
         db.delete(friend1)
         db.delete(friend2)
         db.commit()
         return True
     except Exception as e:
+        log.error(e)
         return False
 
 
@@ -107,7 +108,8 @@ def add_frequest(db: Session, sender_id: int, recipient_id: int):
 
         return True
 
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -129,7 +131,8 @@ def get_users_frequests(db: Session, user_id: int):
 def get_game(db: Session, iden: int):
     try:
         return db.query(models.Game).filter(models.Game.id == iden).first()
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -149,7 +152,7 @@ def add_game(db: Session, game: dict):
         return new_game
 
     except Exception as e:
-        print(e)
+        log.error(e)
         return False
 
 
@@ -160,7 +163,8 @@ def add_user_game(db: Session, user: models.User, game: models.Game):
 
         return True
 
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -172,6 +176,7 @@ def remove_user_game(db: Session, user: models.User, game: models.Game):
         return True
 
     except Exception as e:
+        log.error(e)
         return False
 
 
@@ -194,13 +199,15 @@ def add_invite(db: Session, author: models.User, gameid: int, slots: int = None,
         return True
 
     except Exception as e:
+        log.error(e)
         return False
 
 
 def get_invite(db: Session, iden: int):
     try:
         return db.query(models.Invite).filter(models.Invite.id == iden).first()
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -210,7 +217,7 @@ def remove_invite(db: Session, invite: models.Invite):
         db.commit()
         return True
     except Exception as e:
-        print(e)
+        log.error(e)
         return False
 
 
@@ -218,7 +225,8 @@ def join_event(db: Session, user: models.User, event: models.Invite):
     try:
         user.invite = event
         db.commit()
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -226,7 +234,8 @@ def leave_event(db: Session, user: models.User):
     try:
         user.invite = None
         db.commit()
-    except Exception:
+    except Exception as e:
+        log.error(e)
         return False
 
 
@@ -240,3 +249,14 @@ def get_full_user_by_email(db: Session, mail: str):
 
 def get_game_by_name(db: Session, name: str):
     return db.query(models.Game).filter(models.Game.name == name).all()
+
+
+def get_invites(db: Session, user: models.User):
+    invites = []
+    for friend in user.friends:
+        uf = get_user(db, friend.friend_id)
+        if uf.invite:
+            game = get_game(db, uf.invite.game_id)
+            if game in user.games:
+                invites.append(uf.invite)
+    return invites

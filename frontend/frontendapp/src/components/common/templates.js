@@ -1,18 +1,8 @@
-import {React, Component} from 'react'
-import handleError from '../common/handleError'
-import { Navigate } from 'react-router-dom'
-
-
-class UnFriendButton extends Component {
-
-  state = {
-    done: false,
-    navigator: false,
-  }
-
-  unFriend = () => {
-    fetch('http://localhost:8000/users/' + this.props.friend_id + '/unfriend?token=' + localStorage.getItem('token'))
+  testFunc = () => {
+    fetch('http://localhost:8000/users/getid?token=pepeugandawarrior@seznam.czD0PIU0S6UPWU2JN6U4P2WXT5LI7B7JA2IAPKCWMMHGRWU96NBGFHTVWOOEFI4QZQK7AAJ6KPOXV800HCFQRSVF35F82YQ2RABLKCWED4FB8BC9N4EYSU8LP9G79317XAC7JB27456KLF6DMRKJ58TS5WE280PVU5NUIULCMJDCLI0SEOG8Y583EJG821XODHODK3HSQY47SVXJPW2XEW4GJ3M61BPI9EQN8TVUSX21MRFXBFGW2UMPCPLD1I32V8X')
     .then((response) => {return response.json()})
+
+    
     .then((jsondata) => {
       if(Object.keys(jsondata).includes('detail')){
         let redirectAddress = handleError(jsondata['detail'])
@@ -21,10 +11,12 @@ class UnFriendButton extends Component {
         }
       }
       else{
-        window.location.reload();
+        console.log('valid')
       }
     }
     )
+
+
   }
 
 
@@ -39,16 +31,3 @@ class UnFriendButton extends Component {
       }
     }
   }
-
-
-  render() {
-    return (
-    <div>
-      {this.renderNavigator()}
-      <button onClick={this.unFriend}>UNFRIEND</button>
-    </div>
-  );
-  }
-}
-
-export default UnFriendButton;

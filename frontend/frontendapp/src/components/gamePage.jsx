@@ -1,5 +1,6 @@
 import {React, Component} from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
+import handleError from './common/handleError';
 
 
 function withParams(Component) {
@@ -11,6 +12,7 @@ class GamePage extends Component {
   state = {
     game: {},
     userGames: [],
+    navigator: false,
   }
 
   componentDidMount(){
@@ -21,27 +23,83 @@ class GamePage extends Component {
   getGame = (gameId) =>{
   fetch('http://localhost:8000/games/' + gameId)
   .then((response) => {return response.json();})
-  .then((jsondata) => {this.setState({game: jsondata});})
+  .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({game: jsondata});
+      }
+    }
+    )
 }
 
   getProfile = (iden) => {
     fetch('http://localhost:8000/users/' + iden.toString())
     .then((response) => {return response.json();})
-    .then((jsondata) => {this.setState({userGames:jsondata.games})})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        this.setState({userGames:jsondata.games});
+      }
+    }
+    )
   }
 
   removeGame = () => {
     let path = 'http://localhost:8000/games/' + this.state.game.id + '/remove?token=' + localStorage.getItem('token');
     fetch(path)
     .then((response) => {return response.json();})
-    .then((jsondata) => {window.location.reload();})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
   }
 
   addGame = () => {
     let path = 'http://localhost:8000/games/' + this.state.game.id + '/add?token=' + localStorage.getItem('token');
     fetch(path)
     .then((response) => {return response.json();})
-    .then((jsondata) => {window.location.reload();})
+    .then((jsondata) => {
+      if(Object.keys(jsondata).includes('detail')){
+        let redirectAddress = handleError(jsondata['detail'])
+        if(redirectAddress){
+          this.setState({navigator: redirectAddress})
+        }
+      }
+      else{
+        window.location.reload();
+      }
+    }
+    )
+  }
+
+  renderNavigator = () => {
+    if(this.state.navigator) {
+      if(window.location.href.replace('http://localhost:3000', '') != this.state.navigator)
+      {
+        return <Navigate to={this.state.navigator}/>
+      }
+      else{
+        window.location.reload();
+      }
+    }
   }
 
   renderButton = () => {
@@ -59,6 +117,7 @@ class GamePage extends Component {
         <img src={this.state.game.cover}/>
         <h1>{this.state.game.name}</h1>
         {this.renderButton()}
+        {this.renderNavigator()}
       </div>
     
   );

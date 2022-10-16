@@ -1,5 +1,7 @@
 import React from 'react';  
 import { NavLink } from 'react-router-dom';
+import handleError from '../common/handleError'
+
 
 class ConfirmPopup extends React.Component {  
     render() {  
@@ -31,7 +33,18 @@ class SelectGameAddPopup extends React.Component {
         event.preventDefault()
         fetch('http://localhost:8000/games/search?name=' + this.state.value)
         .then((response) => {return response.json();})
-        .then((jsondata) => {this.setState({games: jsondata})})
+        .then((jsondata) => {
+            if(Object.keys(jsondata).includes('detail')){
+                let redirectAddress = handleError(jsondata['detail'])
+                    if(redirectAddress){
+                        this.setState({navigator: redirectAddress})
+                    }
+            }
+            else{
+                this.setState({games: jsondata})
+            }
+        }
+        )
     }
 
     render() {  
