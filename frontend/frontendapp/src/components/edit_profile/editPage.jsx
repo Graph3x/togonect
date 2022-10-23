@@ -134,6 +134,18 @@ class EditPage extends Component {
     this.setState({showPopup: !this.state.showPopup});
   }
 
+  renderNickInput = () => {
+    let inLen = this.state.value.length
+    let validLen = inLen > 1 && inLen < 32
+    let validChars = /^[ \w+]*$/.test(this.state.value)
+
+    if((validLen == false && inLen != 0) || !validChars){
+      return <p className='nick_text'>{'Nickname has to be 2 to 31 characters long using only number, letters, spaces and _.'}</p>
+    }
+  
+    return <button onClick={this.handleSave} id='save_profile_button'>SAVE</button>
+  }
+
   render() {
     return (
       <Fragment>
@@ -142,10 +154,10 @@ class EditPage extends Component {
         <div id='edit'>
           {this.renderRedirect()}
           <div className='center_holder'>
-            <form>        
+            <form>
               <input type="text" value={this.state.value} onChange={this.handleChange} placeholder={this.state.userdata.username} className='edit_nickname'/>
             </form>
-            <button onClick={this.handleSave} id='save_profile_button'>SAVE</button>
+            {this.renderNickInput()}
           </div>
           <div id='games_div' className='center_holder'>
             {this.state.games.map(g => this.gameElement(g))}

@@ -12,7 +12,7 @@ class AddInvPage extends Component {
         game: '',
         useSlots: true,
         slots: 5,
-        time: '',
+        time: null,
         userdata: '',
         games: [],
         navigator: false,
@@ -142,6 +142,20 @@ class AddInvPage extends Component {
     }
   }
 
+  renderTimeSelector = () => {
+    if(this.state.value){
+      console.log(this.state.value)
+      let now = Date.now()
+      let picked = new Date(this.state.value)
+      console.log(picked)
+      if(picked <= now){
+        return <p>Date cant be in the past</p>
+      }
+    }
+    return <button onClick={this.handleSave}>SEND</button>
+    
+  }
+
 
   render() {
 
@@ -176,9 +190,8 @@ class AddInvPage extends Component {
               {this.renderNavigator()}
               <h2>Pick time or no time</h2>
               <input type="datetime-local" value={this.state.value} onChange={(e) => this.handleChange(e)}
-              id="time_selector"
-              placeholder="Select Time" />
-              <button onClick={this.handleSave}>SEND</button>
+              id="time_selector"/>
+              {this.renderTimeSelector()}
             </div>
         )
     }
