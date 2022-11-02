@@ -1,7 +1,6 @@
 import {React, Component, Fragment} from 'react';
 import { useParams } from 'react-router-dom';
 import { NavLink, Navigate } from 'react-router-dom';
-import OptionsMenu from './optionsMenu';
 import AddFriendButton from './addFriendButton';
 import UnFriendButton from './unFriendButton';
 import handleError from '../common/handleError';
@@ -17,7 +16,6 @@ class Profile extends Component {
     state = {
         userdata : 'None',
         id : 'None',
-        render_options: false,
         frqs: [],
         games: [],
         navigator: false,
@@ -64,11 +62,6 @@ class Profile extends Component {
       }
     }
     )
-  }
-
-  options = () => {
-    if(this.state.render_options){this.setState({render_options: false})}
-    else {this.setState({render_options: true})}
   }
 
 
@@ -122,14 +115,6 @@ class Profile extends Component {
   }
 
 
-  renderOptions = () => {
-    if (this.state.render_options)
-    {
-      return <OptionsMenu/>
-    }
-  }
-
-
   gameElement = (game) => {
     return(
         <Fragment key={game.id}>
@@ -158,8 +143,6 @@ class Profile extends Component {
     return (
         <div id='profile' className='root_div'>
             {this.renderNavigator()}
-            <button onClick={this.options} className='general_button'>OPTIONS</button>
-            {this.renderOptions()}
             {this.renderButton()}
             <br/>
             <div className='center_holder'>

@@ -78,7 +78,7 @@ class GoogleButton extends Component {
         {this.renderRedirect()}
         {this.renderNavigator()}
         <GoogleOAuthProvider clientId="482211007182-h2fa91plomr40ve2urcc9pne9du53gqo.apps.googleusercontent.com">
-          <GoogleLogin onSuccess={tokenResponse => {this.responseGoogle(tokenResponse)}} theme='filled_blue' shape='pill'></GoogleLogin>
+          <GoogleLogin onSuccess={tokenResponse => {this.responseGoogle(tokenResponse)}} theme='filled_blue' shape='pill' size='large'></GoogleLogin>
         </GoogleOAuthProvider>
       </div>
   );

@@ -1,31 +1,145 @@
 :root {
+    --bg-primary: #18191E;
+    --bg-secondary: #333848;
+    --bg-terceary: #000000;
+
+    --accent-primary: #DE1212;
+    --accent-secondary: #D9D9D9;
+    --accent-terceary: white;
+
     --color1: #181a17;
     --color2: blue;
     --color3: orangered;
     --color12: #2b2e29;
 }
 
-
 * {
     margin: 0;
     padding: 0px;
     border: 0px;
+    box-sizing: border-box;
 
 }
 
 
 body {
-    color: var(--color3);
-    background-color: var(--color1);
+    color: var(--accent-primary);
+    background-color: var(--bg-primary);
 }
+
+.clickable:hover {
+    cursor: pointer;
+}
+
+.container {
+    display: flex;
+}
+
+.center {
+    justify-content: center;
+}
+
+@media (max-width: 500px) {
+
+    .mobhide {
+        display: none;
+    }
+
+}
+
+.swap-flex {
+    flex-direction: column;
+}
+
 
 .test {
     border: 5px solid yellow;
 }
 
-.background {
-    background-color: var(--color1);
+
+
+
+
+
+
+
+
+
+#login-page {
+    background: url('./imgs/login_background.png');
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
 }
+
+#inner-login {
+    background: var(--bg-secondary);
+    height: 600px;
+    width: 420px;
+    align-self: center;
+    border-radius: 10%;
+    border: solid var(--accent-primary) 3.5px;
+    color: var(--accent-secondary);
+}
+
+#login-logo {
+    width: 200px;
+    height: 200px;
+    left: 27%;
+}
+
+#login-logo-holder {
+    text-align: center;
+}
+
+
+#login-with {
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+@media (max-width: 370px) {
+    #inner-login {
+        font-size: 0.8rem;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+#navbar {
+    width: 100vw;
+    background: var(--bg-secondary);
+    height: 60px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.nav-element {
+    background: inherit;
+    align-self: center;
+    
+
+}
+
+.nav-pic {
+    height: 45px;
+}
+
+
+
+
+
+
+
+
+
+
 
 .general_button {
     position: relative;
@@ -66,11 +180,6 @@ body {
     height: 0;
 }
 
-#navbar {
-    width: 100%;
-    background: var(--color12);
-    height: 50px;
-}
 
 .profile_game {
     position: relative;
@@ -177,18 +286,7 @@ body {
     padding: 3px;
 }
 
-.navelement {
-    height: 50px;
-    display: inline-block;
-    background: var(--color12);
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    margin-top: 5px;
-    height: 50%;
-    margin-left: 6vw;
 
-}
 
 .center_holder {
     position: absolute;
@@ -207,13 +305,13 @@ body {
     left: 35vw;
 }
 
-.center {
+/*.center {
     position: relative;
     max-width: 100%;
     max-height: 100%;
     margin-top: -50%;
     margin-left: -50%;
-}
+}*/
 
 .edit_nickname {
     position: relative;
