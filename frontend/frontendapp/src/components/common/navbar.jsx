@@ -1,5 +1,6 @@
 import {React, Component} from 'react';
 import { NavLink } from 'react-router-dom';
+import OutsideClickHandler from 'react-outside-click-handler'
 
 import OptionsMenu from './optionsMenu';
 
@@ -13,7 +14,8 @@ class Navbar extends Component {
   state = {
     friendsPath: '/friends',
     homePath: '/homepage',
-    profilePath: '/', 
+    profilePath: '/',
+    renderPopup: false,
   }
 
   componentDidMount() {
@@ -21,13 +23,35 @@ class Navbar extends Component {
     this.setState({profilePath: newPath});
   }
 
+  renderPopup = () => {
+    if (this.state.renderPopup) {
+      return(
+        <div id='popup-div' className='slide-in'>
+          <OptionsMenu/>
+        </div> 
+      )
+    }
+
+    return(
+      <div id='popup-div'>
+        <OptionsMenu/>
+      </div> 
+    )
+    } 
+
+
   render() {
     return (
-        <div id='navbar'>
+      <div id='navbar-wrap'>
 
-            <button className='nav-element'>
-              <img src={nav_menu} className='nav-pic'/>
-            </button>
+            <OutsideClickHandler onOutsideClick={() => this.setState({'renderPopup': false})}>
+              {this.renderPopup()}
+              <button id='nav-menu' className='clickable' onClick={() => this.setState({'renderPopup': !this.state.renderPopup})}>
+                <img src={nav_menu} className='nav-pic'/>
+              </button>
+            </OutsideClickHandler>
+
+        <div id='navbar'>
 
             <NavLink to={this.state.friendsPath} className='nav-element'>
               <img src={nav_friends} className='nav-pic'/>
@@ -41,7 +65,10 @@ class Navbar extends Component {
               <img src={nav_profile} className='nav-pic'/>
             </NavLink>
 
+            
+
         </div>
+      </div>
   );
   }
 }

@@ -1,7 +1,7 @@
 :root {
     --bg-primary: #18191E;
     --bg-secondary: #333848;
-    --bg-terceary: #000000;
+    --bg-terceary: #2a0909;
 
     --accent-primary: #DE1212;
     --accent-secondary: #D9D9D9;
@@ -130,6 +130,47 @@ body {
 .nav-pic {
     height: 45px;
 }
+
+#popup-div.slide-in {
+    transition: 0.5s;
+    height: 20vh;
+}
+#popup-div {
+    position: fixed;
+    top: 0;
+    height: 0;
+    transition: 0.5s;
+    width: 10em;
+    overflow: hidden;
+    background-color: var(--bg-terceary);
+    z-index: 100;
+    left: 0;
+}
+
+#nav-menu {
+    margin-top: 7px;
+    position: absolute;
+    background: inherit;
+    left: 8px;
+}
+
+
+
+
+
+
+
+
+
+
+#profile-banner {
+    width: 100vw;
+    height: 200px;
+    background: url('./imgs/login_background.png');
+}
+
+
+
 
 
 

@@ -4,6 +4,7 @@ import { NavLink, Navigate } from 'react-router-dom';
 import AddFriendButton from './addFriendButton';
 import UnFriendButton from './unFriendButton';
 import handleError from '../common/handleError';
+import banner from '../../imgs/login_background.png'
 
 
 function withParams(Component) {
@@ -144,7 +145,9 @@ class Profile extends Component {
         <div id='profile' className='root_div'>
             {this.renderNavigator()}
             {this.renderButton()}
-            <br/>
+            
+            <div id='profile-banner'></div>
+
             <div className='center_holder'>
               <img src={this.state.userdata.profile_picture} referrerPolicy="no-referrer" alt='Profile picture' className=  'profile_pfp'/>
             </div>
